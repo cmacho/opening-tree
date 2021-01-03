@@ -1,6 +1,7 @@
 
 import chess
 import chess.pgn
+import queue
 
 
 class Graph(object):
@@ -107,8 +108,8 @@ class Graph(object):
                     node.add_moves([san])
 
     def find_origins(self):
-        """ Adds the list of origins to each node in the graph. Here, origins means a sequence of moves through which the
-        position could have been reached.
+        """ Adds the list of origins to each node in the graph. Here, origins means a sequence of moves through which
+        the position could have been reached.
         Requires that graph is nonempty.
         """
         list_of_sans = []
@@ -132,6 +133,40 @@ class Graph(object):
             list_of_sans.append(san)
             self.find_origins_in_subgraph(new_fen, list_of_sans)
             list_of_sans.pop()
+
+    def compute_stats(self, fen):
+        """ Compute the number of nodes in the subgraph rooted at fen and the number of leaves in that subgraph
+
+        Args:
+            fen: (string) A fen representation of a board position such that fen is one of the keys of self.dict
+
+        Returns:
+            num_leaves (int) The number of leaves in the subgraph
+            num_nodes (int) The number of nodes in the subgraph
+        """
+        num_leaves = 0
+        num_nodes = 0
+        next_fens_to_look_at = queue.Queue()
+        next_fens_to_look_at.put(fen)
+        explored_fens = {fen}  # set of the fens that have already been looked at or added to queue
+
+        while not next_fens_to_look_at.empty():
+            curr_fen = next_fens_to_look_at.get()
+            curr_node = self.get_node(curr_fen)
+            assert curr_node is not None
+
+            num_nodes += 1
+
+            if curr_node.out_degree == 0:
+                assert len(curr_node.explored_moves) == 0
+                num_leaves += 1
+            for san in curr_node.explored_moves:
+                new_fen = get_next_fen(curr_fen, san)
+                if new_fen not in explored_fens:
+                    next_fens_to_look_at.put(new_fen)
+                    explored_fens.add(new_fen)
+
+        return num_leaves, num_nodes
 
 
 class BadOpeningGraphError(Exception):
@@ -236,10 +271,9 @@ def build_pgn_from_list_of_san_moves(list_of_sans):
     return " ".join(new_list)
 
 
-def run_tests():
-    ###############
-    # Test case 1
-    ###############
+def test1():
+    """ test case 1"""
+    print(" ")
     print("Test case 1")
     pgn = open("../test_data/good_opening_white.pgn")
     game = chess.pgn.read_game(pgn)
@@ -257,8 +291,12 @@ def run_tests():
     print("Explored moves for position after 1. d4 d5")
     print(explored_moves)
 
+    print("stats for this position:")
+    num_leaves, num_nodes = graph.compute_stats(fen)
+    print(f"num_leaves is {num_leaves} and num_nodes is {num_nodes}")
+
     # get next fen after executing the first move in the list of explored moves
-    print("executing the first move from the list.")
+    print("executing the first move from the list of explored moves.")
     next_fen = get_next_fen(fen, explored_moves[0])
 
     new_node = graph.dict[next_fen]
@@ -268,9 +306,15 @@ def run_tests():
     explored_moves = new_node.explored_moves
     print(explored_moves)
 
-    ###############
-    # Test case 2
-    ###############
+    print("stats for this position:")
+    next_num_leaves, next_num_nodes = graph.compute_stats(next_fen)
+    assert next_num_leaves == num_leaves
+    assert next_num_nodes == num_nodes - 1
+    print(f"num_leaves is {next_num_leaves} and num_nodes is {next_num_nodes}")
+
+
+def test2():
+    """ test case 2"""
     print(" ")
     print("Test case 2")
     pgn = open("../test_data/very_bad_opening_white.pgn")
@@ -286,9 +330,9 @@ def run_tests():
     else:
         raise Exception("should not reach here. BadOpeningGraphError was not successfully raised and caught")
 
-    ###############
-    # Test case 3
-    ###############
+
+def test3():
+    """ test case 3 """
     print(" ")
     print("Test case 3")
     pgn = open("../test_data/bad_opening_white.pgn")
@@ -304,30 +348,31 @@ def run_tests():
     else:
         raise Exception("should not reach here. BadOpeningGraphError was not successfully raised and caught")
 
-    ###############
-    # Test case 4
-    ###############
+
+def test4():
+    """ test case 4"""
     print(" ")
     print("Test case 4")
     pgn = open("../test_data/good_opening_black.pgn")
     game = chess.pgn.read_game(pgn)
     graph = Graph("b", game)
 
-    ###############
-    # Test case 5
-    ###############
+
+def test5():
+    """ test case 5 """
     print(" ")
     print("Test case 5")
     pgn = open("../test_data/good_opening_white.pgn")
     game = chess.pgn.read_game(pgn)
     graph = Graph("w", game)
 
+    fen = "rnbqkb1r/pp4pp/3ppn2/2p5/4P3/2N5/PPP2PPP/R1BQKBNR w KQkq -"
     print("getting origins for this position: ")
-    print("rnbqkb1r/pp4pp/3ppn2/2p5/4P3/2N5/PPP2PPP/R1BQKBNR w KQkq -")
+    print(fen)
     print("which looks like this:")
-    print(chess.Board("rnbqkb1r/pp4pp/3ppn2/2p5/4P3/2N5/PPP2PPP/R1BQKBNR w KQkq -"))
+    print(chess.Board(fen))
 
-    node = graph.get_node("rnbqkb1r/pp4pp/3ppn2/2p5/4P3/2N5/PPP2PPP/R1BQKBNR w KQkq -")
+    node = graph.get_node(fen)
     origins = node.origins
     print(f"number of origins is {len(origins)}")
     print("the origins are")
@@ -336,7 +381,11 @@ def run_tests():
 
     print(f"The explored_moves for the current position are {node.explored_moves} (should only be one)")
 
-    #another example based on output of Graph.saturate():
+    num_leaves, num_nodes = graph.compute_stats(fen)
+    print(f"The stats for the current position are")
+    print(f"num_leaves: {num_leaves}, num_nodes: {num_nodes}")
+
+    # another example based on output of Graph.saturate()
     board = chess.Board("rnbqkb1r/ppp2ppp/4pn2/3p4/2PP4/2N2N2/PP2PPPP/R1BQKB1R b KQkq -")
     board.push_san("Nc6")
     fen = relevant_fen_part(board.fen())
@@ -352,9 +401,11 @@ def run_tests():
     for s in origins:
         print(s)
 
-    for fen in graph.dict:
-        if len(graph.dict[fen].origins) > 2:
-            print(len(graph.dict[fen].origins), fen)
+    print(f"The explored_moves for the current position are {node.explored_moves}")
+
+    num_leaves, num_nodes = graph.compute_stats(fen)
+    print(f"The stats for the current position are")
+    print(f"num_leaves: {num_leaves}, num_nodes: {num_nodes}")
 
     # a third example where there are more origins:
     fen = "rn1qkb1r/ppp1pppp/8/3n1b2/3P4/5N2/PP1NPPPP/R1BQKB1R b KQkq -"
@@ -369,6 +420,33 @@ def run_tests():
     for s in origins:
         print(s)
 
+    print(f"The explored_moves for the current position are {node.explored_moves}")
+
+    num_leaves, num_nodes = graph.compute_stats(fen)
+    print(f"The stats for the current position are")
+    print(f"num_leaves: {num_leaves}, num_nodes: {num_nodes}")
+
+
+def test6():
+    """ test case 6 """
+    pgn = open("../test_data/good_opening_white.pgn")
+    game = chess.pgn.read_game(pgn)
+    graph = Graph("w", game)
+
+    initial_fen = relevant_fen_part(chess.STARTING_FEN)
+    num_leaves, num_nodes = graph.compute_stats(initial_fen)
+
+    assert num_nodes == len(graph.dict)
+
+    print("entire good_opening_white opening_book:")
+    print("num_leaves", num_leaves)
+    print("num_nodes", num_nodes)
+
+
+def run_tests():
+    tests = [test1, test2, test3, test4, test5, test6]
+    for test in tests:
+        test()
 
 
 # test the module
