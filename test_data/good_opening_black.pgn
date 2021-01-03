@@ -1,0 +1,24 @@
+[Event "?"]
+[Site "?"]
+[Date "2020.12.07"]
+[Round "?"]
+[White "White"]
+[Black "Black"]
+[Result "*"]
+
+1. d4 (1. e4 e5 2. Nf3 (2. d4 exd4 3. Nf3 (3. Qxd4 Nf6 4. Qe3 d5) (3.
+c3 dxc3 4. Nxc3 (4. Bc4 cxb2 5. Bxb2 Nf6 6. e5 Bb4+ 7. Bc3 Qe7) Bc5 5. Nf3 d6)
+Bb4+ 4. Nbd2 (4. c3 dxc3 5. Nxc3 Nc6) (4. Bd2 Bxd2+ 5. Nbxd2 c5) Nc6 5. Bd3 Nf6
+) (2. Bc4 Nf6 3. d3 c6 4. Bb3 d5 5. Nf3 a5 6. a4 Bb4+) (2. d3 Nc6 3. Nf3 Nf6 4.
+g3 d5) Nc6 3. Bc4 (3. Bb5 Nf6 4. O-O (4. Bxc6 dxc6 5. d3 (5. Nxe5 Qd4) Bd6) Nxe4
+5. Re1 Nd6 6. Nxe5 (6. Bxc6 dxc6 {EV: 53.9%, N: 99.76% of 10.0M} 7. Nxe5 {EV:
+46.3%, N: 56.54% of 10.0M} Be7 {EV: 54.0%, N: 98.39% of 10.0M} 8. d3 {EV: 46.2%,
+N: 41.57% of 10.0M} O-O {EV: 53.2%, N: 60.28% of 2.0k}) Nxe5) (3. Nc3 Nf6 4. Bb5
+Bb4) Bc5 4. O-O (4. d3 Nf6 5. c3 d6) (4. Nc3 Nf6 5. d3 O-O) (4. c3 Nf6 5. d3 (
+5. d4 exd4 6. e5 d5) d6) Nf6 5. d3 d6) (1. b3 e5 2. Bb2 Nc6 3. e3 Nf6 4. Nf3 e4
+) (1. g3 d5 2. Nf3 c5 3. Bg2 Nf6 4. O-O e6 5. d4 cxd4 6. Nxd4 e5) (1. c4 e5 2.
+g3 (2. Nc3 Nf6 3. Nf3 Nc6 4. e4 Bb4 5. d3 d6) (2. e3 Nf6 3. Nc3 Nc6 4. Nf3 Bb4
+5. Qc2 Bxc3) Nf6 3. Bg2 d5 4. cxd5 Nxd5 5. Nc3) (1. Nf3 e6 2. c4 (2. e4 d5 3.
+exd5 exd5 4. d4 Nc6 5. Nc3 Nf6) (2. d4 d5 3. c4 Nf6) (2. g3 d5 3. d4 c5 4. c4
+dxc4 5. Bg2 Nc6) d5 3. d4 Nf6) Nf6 2. c4 (2. Nd2 d5 3. Ngf3 Bf5) (2. Nc3 d5 3.
+Bf4 e6) e6 3. Nf3 d5 4. Nc3 (4. e3 Be7 5. b3 c5) Be7 5. Bf4 O-O *

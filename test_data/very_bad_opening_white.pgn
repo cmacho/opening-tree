@@ -1,0 +1,39 @@
+[Event "?"]
+[Site "?"]
+[Date "2020.12.07"]
+[Round "?"]
+[White "White"]
+[Black "Black"]
+[Result "*"]
+
+1. d4 Nf6 (1... d5 2. c4 c6 (2... dxc4 3. e4 {EV: 58.6%, N: 91.99% of 44.5k} e5
+{EV: 41.9%, N: 73.12% of 58.1k} (3... Nf6 {EV: 41.6%, N: 14.24% of 58.1k} 4. e5
+Nd5 5. Bxc4 Bf5 6. Qb3) (3... b5 {EV: 39.0%, N: 8.16% of 58.1k} 4. a4 {EV:
+61.6%, N: 96.74% of 3.8k} c6 {EV: 38.8%, N: 95.50% of 5.1k} 5. axb5 {EV: 61.7%,
+N: 94.34% of 3.8k} cxb5 {EV: 38.8%, N: 97.82% of 2.9k} 6. Nc3 {EV: 62.6%, N:
+94.94% of 2.0k} Qb6 {EV: 41.5%, N: 10.96% of 365} 7. b3 {EV: 62.4%, N: 92.30% of
+1.0k} e6 {EV: 38.9%, N: 95.82% of 2.0k} 8. bxc4 {EV: 62.7%, N: 94.87% of 409}) (
+3... Nc6 {EV: 39.1%, N: 1.16% of 58.1k} 4. Nf3 {EV: 63.3%, N: 99.08% of 10.0M}
+Bg4 {EV: 36.9%, N: 97.05% of 10.0M} 5. d5 {EV: 63.3%, N: 98.34% of 10.0M} Ne5
+{EV: 36.8%, N: 99.41% of 10.0M} 6. Nc3 {EV: 63.4%, N: 97.74% of 10.0M}) 4. Nf3
+exd4 5. Bxc4 Nc6 6. O-O Be6 7. Bxe6) (2... Nf6 3. cxd5 c6 (3... Nxd5 4. Nf3 Bf5
+5. Nbd2 Nb6 6. e4 Bg6 7. h4) 4. dxc6 Nxc6 5. Nf3 e5 6. dxe5) (2... e6 3. Nc3 Nf6
+(3... Nc6 4. Nf3 Nf6 5. a3) (3... Bb4 4. cxd5 exd5 5. Bf4 c5 6. dxc5) 4. cxd5
+exd5 5. Bg5 Be7 6. e3) (2... Nc6 3. cxd5 Qxd5 4. e3 e5 5. Nc3 Bb4 6. a3) (2...
+e5 3. dxe5 d4 4. Nf3 Nc6 5. Nbd2 Nge7 6. Nb3) (2... Bf5 3. cxd5 Nf6 4. Nf3 Nxd5
+5. Nbd2 Nb6 6. e4) 3. Nf3 Nf6 (3... dxc4 4. e3 b5 5. a4 e6 6. axb5 cxb5 7. b3
+Nf6 8. bxc4) (3... e6 4. b3 Nf6 5. e3 Nbd7 6. Bb2) 4. e3 (4. Nc3 dxc4 5. a4 Bf5
+6. Ne5 Nbd7 7. Nxc4) Bf5 5. Nc3 e6 6. Nh4) (1... e6 2. e4 d5 (2... c5 3. d5 Nf6
+4. Nc3 d6 5. dxe6 fxe6 6. Nf3) (2... b6 3. Nf3 Bb7 4. Bd3 c5 5. c3 Nf6 6. Qe2)
+3. Nd2 c5 4. Ngf3 cxd4 5. exd5 Qxd5 6. Bc4) (1... c6 2. Nf3 Nf6 (2... b6 3. e4)
+3. e3 d5 4. c4) (1... d6 2. Nc3 Nf6 (2... e5 3. Nf3 Nd7 (3... exd4 4. Nxd4 Nf6
+5. e4) 4. e4 c6 5. a4) (2... g6 3. e4 Bg7 4. Be3) 3. e4 e5 4. Nf3 Nbd7 5. Bc4
+Be7 6. a4) (1... e5 2. dxe5 Bc5 (2... Nc6 3. Nf3) 3. Nc3 Ne7 4. Na4 Bb6 5. Nxb6
+) (1... f5 2. g3 Nf6 3. c4 d6 4. Nf3) (1... g6 2. e4 Bg7 3. Nc3 d5 4. exd5 Nf6
+5. Bc4) (1... a6 2. e4 e6 3. Bd3 d5 4. Nc3 c5 5. dxc5 Bxc5 6. exd5 exd5 7. Nxd5
+) (1... c5 2. d5 d6 (2... Nf6 3. Nc3 d6 4. e4 e6) 3. c4 g6
+4. Nf3 e6 5. e4) (1... Nc6 2. d5 Ne5 3. f4 Ng6 4. Nf3 e6 5. dxe6 fxe6 6. e4) (
+1... b6 2. e4 Bb7 3. Bd3 d6 4. Nf3 Nd7 5. a4) (1... b5 2. e4 a6 3. a4) 2. c4 e6
+(2... g6 3. Nc3 d5 4. cxd5 Nxd5 5. e4 Nxc3 6. bxc3) (2... c5 3. d5 b5 4. cxb5 a6
+5. bxa6 e6 6. Nc3) (2... d6 3. Nc3 g6 4. e4 Bg7 5. Nf3 O-O 6. Be2) 3. Nf3 d5 4.
+Nc3 Be7 5. Bf4 O-O 6. e3 *
