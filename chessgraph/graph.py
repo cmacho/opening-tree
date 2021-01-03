@@ -20,6 +20,7 @@ class Graph(object):
         if game is not None:
             self.consume_pgn_game(game)
             self.saturate()
+            self.find_origins()
 
     def add_node_moves(self, fen, move_list):
         """ Add the moves in move_list to the node corrsponding to the board position represented by fen
@@ -105,6 +106,33 @@ class Graph(object):
                     print(f"Adding {san} to {fen}")
                     node.add_moves([san])
 
+    def find_origins(self):
+        """ Adds the list of origins to each node in the graph. Here, origins means a sequence of moves through which the
+        position could have been reached.
+        Requires that graph is nonempty.
+        """
+        list_of_sans = []
+        initial_fen = relevant_fen_part(chess.STARTING_FEN)
+        self.find_origins_in_subgraph(initial_fen, list_of_sans)
+
+    def find_origins_in_subgraph(self, fen, list_of_sans):
+        """  Adds the list of origins to each node in the subgraph rooted at fen.
+
+        Args:
+            fen: (string) A fen representation of a board position such that fen is one of the keys of self.dict
+            list_of_sans: (list) list of strings. The strings represent he moves that led to the current position in
+            SAN format
+        """
+        node = self.get_node(fen)
+        assert node is not None
+        node.add_origin(build_pgn_from_list_of_san_moves(list_of_sans))
+
+        for san in node.explored_moves:
+            new_fen = get_next_fen(fen, san)
+            list_of_sans.append(san)
+            self.find_origins_in_subgraph(new_fen, list_of_sans)
+            list_of_sans.pop()
+
 
 class BadOpeningGraphError(Exception):
     pass
@@ -120,6 +148,7 @@ class Node(object):
         """
         self.explored_moves = move_list.copy()
         self.out_degree = len(self.explored_moves)
+        self.origins = []
 
     def add_moves(self, move_list):
         """ Add the moves in move_list to the explored moves for the chess position represented by the node,
@@ -133,6 +162,10 @@ class Node(object):
             if move not in self.explored_moves:
                 self.explored_moves.append(move)
         self.out_degree = len(self.explored_moves)
+
+    def add_origin(self, origin_string):
+        if origin_string not in self.origins:
+            self.origins.append(origin_string)
 
 
 def fen_to_color(fen):
@@ -181,10 +214,33 @@ def get_next_fen(fen, san):
     return relevant_fen_part(new_full_fen)
 
 
+def build_pgn_from_list_of_san_moves(list_of_sans):
+    """ builds a list of moves in SAN format into a single string containing all the moves with numbers for turns
+
+    Args:
+        list_of_sans: (list) a list of strings, each representing a move in SAN format. The moves should constitute a
+        legal chess game starting from the initial position
+    Returns: (string) a string where all the moves in list_of_sans are combined into one string and numbers are
+    added for turns. In other words, the string represents the game in standard algebraic notation.
+    """
+    if len(list_of_sans) == 0:
+        return ""
+
+    new_list = []
+    count = 0
+    for ii in range(len(list_of_sans)):
+        if ii % 2 == 0:
+            count += 1
+            new_list.append(str(count) + ".")
+        new_list.append(list_of_sans[ii])
+    return " ".join(new_list)
+
+
 def run_tests():
     ###############
     # Test case 1
     ###############
+    print("Test case 1")
     pgn = open("../test_data/good_opening_white.pgn")
     game = chess.pgn.read_game(pgn)
 
@@ -216,6 +272,7 @@ def run_tests():
     # Test case 2
     ###############
     print(" ")
+    print("Test case 2")
     pgn = open("../test_data/very_bad_opening_white.pgn")
     game = chess.pgn.read_game(pgn)
 
@@ -233,6 +290,7 @@ def run_tests():
     # Test case 3
     ###############
     print(" ")
+    print("Test case 3")
     pgn = open("../test_data/bad_opening_white.pgn")
     game = chess.pgn.read_game(pgn)
 
@@ -250,9 +308,67 @@ def run_tests():
     # Test case 4
     ###############
     print(" ")
+    print("Test case 4")
     pgn = open("../test_data/good_opening_black.pgn")
     game = chess.pgn.read_game(pgn)
     graph = Graph("b", game)
+
+    ###############
+    # Test case 5
+    ###############
+    print(" ")
+    print("Test case 5")
+    pgn = open("../test_data/good_opening_white.pgn")
+    game = chess.pgn.read_game(pgn)
+    graph = Graph("w", game)
+
+    print("getting origins for this position: ")
+    print("rnbqkb1r/pp4pp/3ppn2/2p5/4P3/2N5/PPP2PPP/R1BQKBNR w KQkq -")
+    print("which looks like this:")
+    print(chess.Board("rnbqkb1r/pp4pp/3ppn2/2p5/4P3/2N5/PPP2PPP/R1BQKBNR w KQkq -"))
+
+    node = graph.get_node("rnbqkb1r/pp4pp/3ppn2/2p5/4P3/2N5/PPP2PPP/R1BQKBNR w KQkq -")
+    origins = node.origins
+    print(f"number of origins is {len(origins)}")
+    print("the origins are")
+    for s in origins:
+        print(s)
+
+    print(f"The explored_moves for the current position are {node.explored_moves} (should only be one)")
+
+    #another example based on output of Graph.saturate():
+    board = chess.Board("rnbqkb1r/ppp2ppp/4pn2/3p4/2PP4/2N2N2/PP2PPPP/R1BQKB1R b KQkq -")
+    board.push_san("Nc6")
+    fen = relevant_fen_part(board.fen())
+
+    print(f"getting origins for this position: {fen}")
+    print("which looks like this:")
+    print(board)
+
+    node = graph.get_node(fen)
+    origins = node.origins
+    print(f"number of origins is {len(origins)}")
+    print("the origins are")
+    for s in origins:
+        print(s)
+
+    for fen in graph.dict:
+        if len(graph.dict[fen].origins) > 2:
+            print(len(graph.dict[fen].origins), fen)
+
+    # a third example where there are more origins:
+    fen = "rn1qkb1r/ppp1pppp/8/3n1b2/3P4/5N2/PP1NPPPP/R1BQKB1R b KQkq -"
+    print(f"getting origins for this position: {fen}")
+    print("which looks like this:")
+    print(chess.Board(fen))
+
+    node = graph.get_node(fen)
+    origins = node.origins
+    print(f"number of origins is {len(origins)}")
+    print("the origins are")
+    for s in origins:
+        print(s)
+
 
 
 # test the module
