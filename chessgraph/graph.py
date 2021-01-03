@@ -83,18 +83,22 @@ class Graph(object):
 
     def get_node(self, fen):
         """
-        If a node for fen exists in self, return that node. Else return None.
+        return the node corrsponding to fen
 
         Args:
-            fen: (string) the fen representation of a board position. Can also be only the first parts of a FEN, without
-            the move clocks.
+            fen: (string) the fen representation of a board position which appears in the graph and therefore in
+             self.dict. More specifically, fen is not in FEN format but in a reduced FEN format where the move clocks
+             are not included
 
-        Returns: (Node OR None) returns the node corresponding to fen if it exists, otherwise returns None.
+        Returns: (Node) returns the node corresponding to fen.
         """
-        if fen in self.dict:
-            return self.dict[fen]
-        else:
-            return None
+        return self.dict[fen]
+
+
+    def node_exists(self, fen):
+        """ returns True if there is a node corresponding to fen, False otherwise"""
+        return fen in self.dict
+
 
     def saturate(self):
         """ completes the DAG represented by self by adding any opponent move for which the resulting position is
@@ -105,7 +109,6 @@ class Graph(object):
         opposite_color_fens = [fen for fen in self.dict if fen_to_color(fen) != self.color]
         for fen in opposite_color_fens:
             node = self.get_node(fen)
-            assert node is not None
             board = chess.Board(fen)
 
             legal_moves = list(board.legal_moves)
@@ -137,7 +140,6 @@ class Graph(object):
             SAN format
         """
         node = self.get_node(fen)
-        assert node is not None
         node.add_origin(build_pgn_from_list_of_san_moves(list_of_sans))
 
         for san in node.explored_moves:
@@ -165,7 +167,6 @@ class Graph(object):
         while not next_fens_to_look_at.empty():
             curr_fen = next_fens_to_look_at.get()
             curr_node = self.get_node(curr_fen)
-            assert curr_node is not None
 
             num_nodes += 1
 
