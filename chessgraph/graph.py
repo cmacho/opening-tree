@@ -23,7 +23,7 @@ class Graph(object):
             self.saturate()
             self.find_origins()
 
-    def add_node_moves(self, fen, move_list):
+    def add_moves(self, fen, move_list):
         """ Add the moves in move_list to the node corrsponding to the board position represented by fen. Create the
         node if it does not exist
 
@@ -33,7 +33,6 @@ class Graph(object):
             move_list: (list)a list of strings where each one is a chess move in SAN format (Standard Algebraic
             Notation)
 
-        Returns: (Node) the node corresponding to fen
         Raises: BadOpeningGraphError if after adding the moves, there are more than one moves for the position where
         the player of color self.color is to move.
         """
@@ -46,8 +45,6 @@ class Graph(object):
             raise BadOpeningGraphError(f"There is more than one move for position {fen} "
                                        f"in opening book for color {self.color}. Namely there are these:"
                                        f"{self.dict[fen].explored_moves}")
-
-        return self.dict[fen]
 
     def consume_pgn_game(self, game):
         """
@@ -72,8 +69,8 @@ class Graph(object):
         fen = relevant_fen_part(board.fen())
         move_list = [board.san(child.move) for child in game_node.variations]
 
-        node = self.add_node_moves(fen, move_list)
-        node.add_origin(build_pgn_from_list_of_san_moves(list_of_sans), from_pgn=True)
+        self.add_moves(fen, move_list)
+        self.add_origin(fen, build_pgn_from_list_of_san_moves(list_of_sans), from_pgn=True)
 
         for child in game_node.variations:
             san = board.san(child.move)
@@ -94,11 +91,54 @@ class Graph(object):
         """
         return self.dict[fen]
 
-
     def node_exists(self, fen):
         """ returns True if there is a node corresponding to fen, False otherwise"""
         return fen in self.dict
 
+    def get_moves(self, fen):
+        """ returns the explored moves for the position corresponding to fen
+
+        Args:
+             fen: (string) the fen representation of a board position which appears in the graph and therefore in
+             self.dict. More specifically, fen is not in FEN format but in a reduced FEN format where the move clocks
+             are not included
+        Returns: (list) list of strings representing moves for position fen that are part of the graph.
+         The moves are in SAN format.
+
+        """
+        node = self.get_node(fen)
+        moves = node.get_moves()
+        return moves
+
+    def get_degree(self, fen):
+        """ returns the number of moves at position fen that are part of the graph """
+        node = self.get_node(fen)
+        return node.get_degree()
+
+    def add_origin(self, fen, origin_string, from_pgn=False):
+        """ adds origin_string to the list of origins for the node corresponding to fen. If from_pgn == True, this
+          indicates that the line comes directly from the pgn (and not from the graph computed from the pgn).
+          This information is stored in the node's meta data.
+
+          Args:
+              fen: (string) the fen representation of a board position which appears in the graph and therefore in
+             self.dict. More specifically, fen is not in FEN format but in a reduced FEN format where the move clocks
+             are not included
+              origin_string: (string) a series of moves in san format that leads to the current position
+              from_pgn: (bool) True if the line represented by origin_string was found directly in pgn"""
+        node = self.get_node(fen)
+        node.add_origin(origin_string, from_pgn)
+
+    def print_origins(self, fen):
+        """print the origins of the position, adding 'pgn' to indicate that a line was found directly in the pgn.
+
+        Args:
+             fen: (string) the fen representation of a board position which appears in the graph and therefore in
+             self.dict. More specifically, fen is not in FEN format but in a reduced FEN format where the move clocks
+             are not included
+        """
+        node = self.get_node(fen)
+        node.print_origins()
 
     def saturate(self):
         """ completes the DAG represented by self by adding any opponent move for which the resulting position is
@@ -108,7 +148,6 @@ class Graph(object):
         print("saturating.")
         opposite_color_fens = [fen for fen in self.dict if fen_to_color(fen) != self.color]
         for fen in opposite_color_fens:
-            node = self.get_node(fen)
             board = chess.Board(fen)
 
             legal_moves = list(board.legal_moves)
@@ -118,9 +157,9 @@ class Graph(object):
                 board.push(move)
                 resulting_fen = relevant_fen_part(board.fen())
                 board.pop()
-                if resulting_fen in self.dict and san not in node.explored_moves:
+                if resulting_fen in self.dict and san not in self.get_moves(fen):
                     print(f"Adding {san} to {fen}")
-                    node.add_moves([san])
+                    self.add_moves(fen, [san])
 
     def find_origins(self):
         """ Adds the list of origins to each node in the graph. Here, origins means a sequence of moves through which
@@ -139,10 +178,9 @@ class Graph(object):
             list_of_sans: (list) list of strings. The strings represent he moves that led to the current position in
             SAN format
         """
-        node = self.get_node(fen)
-        node.add_origin(build_pgn_from_list_of_san_moves(list_of_sans))
+        self.add_origin(fen, build_pgn_from_list_of_san_moves(list_of_sans))
 
-        for san in node.explored_moves:
+        for san in self.get_moves(fen):
             new_fen = get_next_fen(fen, san)
             list_of_sans.append(san)
             self.find_origins_in_subgraph(new_fen, list_of_sans)
@@ -166,14 +204,12 @@ class Graph(object):
 
         while not next_fens_to_look_at.empty():
             curr_fen = next_fens_to_look_at.get()
-            curr_node = self.get_node(curr_fen)
-
             num_nodes += 1
 
-            if curr_node.out_degree == 0:
-                assert len(curr_node.explored_moves) == 0
+            if self.get_degree(curr_fen) == 0:
+                assert len(self.get_moves(curr_fen)) == 0
                 num_leaves += 1
-            for san in curr_node.explored_moves:
+            for san in self.get_moves(curr_fen):
                 new_fen = get_next_fen(curr_fen, san)
                 if new_fen not in explored_fens:
                     next_fens_to_look_at.put(new_fen)
@@ -211,6 +247,24 @@ class Node(object):
             if move not in self.explored_moves:
                 self.explored_moves.append(move)
         self.out_degree = len(self.explored_moves)
+
+    def get_moves(self):
+        """
+        returns the explored moves at the node
+
+        Returns:
+            (list) list of strings where each string represents a move in SAN format
+        """
+        return self.explored_moves.copy()
+
+    def get_degree(self):
+        """
+        returns the number of outgoing edges at the node
+
+        Returns: (int) out_degree of the node
+        """
+        assert self.out_degree == len(self.explored_moves)
+        return self.out_degree
 
     def add_origin(self, origin_string, from_pgn=False):
         """ adds origin_string to the list of origins. If from_pgn == True, this
@@ -319,8 +373,7 @@ def test1():
     board.push_san("d5")
     fen = relevant_fen_part(board.fen())
 
-    node = graph.dict[fen]
-    explored_moves = node.explored_moves
+    explored_moves = graph.get_moves(fen)
     print("Explored moves for position after 1. d4 d5")
     print(explored_moves)
 
@@ -332,11 +385,10 @@ def test1():
     print("executing the first move from the list of explored moves.")
     next_fen = get_next_fen(fen, explored_moves[0])
 
-    new_node = graph.dict[next_fen]
     print("new position:")
     print(chess.Board(next_fen))
     print("explored moves for this new position:")
-    explored_moves = new_node.explored_moves
+    explored_moves = graph.get_moves(next_fen)
     print(explored_moves)
 
     print("stats for this position:")
@@ -356,7 +408,7 @@ def test2():
     print("trying to consume very_bad_opening_white.pgn")
 
     try:
-        graph = Graph("w", game)
+        _ = Graph("w", game)
     except BadOpeningGraphError as err:
         print("successfully caught Error.")
         print("The error says:", err)
@@ -374,7 +426,7 @@ def test3():
     print("trying to consume bad_opening_white.pgn")
 
     try:
-        graph = Graph("w", game)
+        _ = Graph("w", game)
     except BadOpeningGraphError as err:
         print("successfully caught Error.")
         print("The error says:", err)
@@ -388,7 +440,7 @@ def test4():
     print("Test case 4")
     pgn = open("../test_data/good_opening_black.pgn")
     game = chess.pgn.read_game(pgn)
-    graph = Graph("b", game)
+    _ = Graph("b", game)
 
 
 def test5():
@@ -409,7 +461,7 @@ def test5():
     origins = node.origins
     print(f"number of origins is {len(origins)}")
     print("the origins are")
-    node.print_origins()
+    graph.print_origins(fen)
 
     print(f"The explored_moves for the current position are {node.explored_moves} (should only be one)")
 
