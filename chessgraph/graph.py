@@ -480,6 +480,5 @@ def run_tests():
         test()
 
 
-# test the module
 if __name__ == "__main__":
     run_tests()
