@@ -24,13 +24,16 @@ class Graph(object):
             self.find_origins()
 
     def add_node_moves(self, fen, move_list):
-        """ Add the moves in move_list to the node corrsponding to the board position represented by fen
+        """ Add the moves in move_list to the node corrsponding to the board position represented by fen. Create the
+        node if it does not exist
 
         Args:
             fen: (string) the FEN (Forsyth-Edwards-Notation) representation of a chess position. More specifically, the
             first four parts of a FEN, without the move-clocks
             move_list: (list)a list of strings where each one is a chess move in SAN format (Standard Algebraic
             Notation)
+
+        Returns: (Node) the node corresponding to fen
         Raises: BadOpeningGraphError if after adding the moves, there are more than one moves for the position where
         the player of color self.color is to move.
         """
@@ -44,6 +47,8 @@ class Graph(object):
                                        f"in opening book for color {self.color}. Namely there are these:"
                                        f"{self.dict[fen].explored_moves}")
 
+        return self.dict[fen]
+
     def consume_pgn_game(self, game):
         """
         Add the data from game to the graph.
@@ -51,23 +56,30 @@ class Graph(object):
         Args:
             game: (chess.pgn.Game) An opening tree loaded directly from a pgn file
         """
-        self.consume_subtree_of_pgn_game(game)
+        list_of_sans = []
+        self.consume_subtree_of_pgn_game(game, list_of_sans)
 
-    def consume_subtree_of_pgn_game(self, game_node):
+    def consume_subtree_of_pgn_game(self, game_node, list_of_sans):
         """
         Add the data from subtree of a pgn game to the graph.
 
         Args:
             game_node: (chess.pgn.GameNode) a node in an opening tree loaded directly from a pgn file
+            list_of_sans: (list) list of moves from the game that game_node belongs to that were executed in order
+            to get to game_node. The moves are in SAN format
         """
         board = game_node.board()
         fen = relevant_fen_part(board.fen())
         move_list = [board.san(child.move) for child in game_node.variations]
 
-        self.add_node_moves(fen, move_list)
+        node = self.add_node_moves(fen, move_list)
+        node.add_origin(build_pgn_from_list_of_san_moves(list_of_sans), from_pgn=True)
 
         for child in game_node.variations:
-            self.consume_subtree_of_pgn_game(child)
+            san = board.san(child.move)
+            list_of_sans.append(san)
+            self.consume_subtree_of_pgn_game(child, list_of_sans)
+            list_of_sans.pop()
 
     def get_node(self, fen):
         """
@@ -184,6 +196,7 @@ class Node(object):
         self.explored_moves = move_list.copy()
         self.out_degree = len(self.explored_moves)
         self.origins = []
+        self.num_pgn_origins = 0
 
     def add_moves(self, move_list):
         """ Add the moves in move_list to the explored moves for the chess position represented by the node,
@@ -198,9 +211,28 @@ class Node(object):
                 self.explored_moves.append(move)
         self.out_degree = len(self.explored_moves)
 
-    def add_origin(self, origin_string):
+    def add_origin(self, origin_string, from_pgn=False):
+        """ adds origin_string to the list of origins. If from_pgn == True, this
+         indicates that the line comes directly from the pgn (and not from the graph
+         computed from the pgn). Thus we increase num_pgn_origins by 1.
+
+         Args:
+             origin_string: (string) a series of moves in san format that leads to the current position
+             from_pgn: (bool) True if the line represented by origin_string was found directly in pgn
+         """
         if origin_string not in self.origins:
             self.origins.append(origin_string)
+            if from_pgn:
+                self.num_pgn_origins += 1
+
+    def print_origins(self):
+        """print the lines in self.origins, adding 'pgn' to indicate that a line was found directly in the pgn.
+        This is determined based on num_pgn_origins """
+        for i, s in enumerate(self.origins):
+            if i < self.num_pgn_origins:
+                print(s, "(pgn)")
+            else:
+                print(s)
 
 
 def fen_to_color(fen):
@@ -376,8 +408,7 @@ def test5():
     origins = node.origins
     print(f"number of origins is {len(origins)}")
     print("the origins are")
-    for s in origins:
-        print(s)
+    node.print_origins()
 
     print(f"The explored_moves for the current position are {node.explored_moves} (should only be one)")
 
@@ -398,8 +429,7 @@ def test5():
     origins = node.origins
     print(f"number of origins is {len(origins)}")
     print("the origins are")
-    for s in origins:
-        print(s)
+    node.print_origins()
 
     print(f"The explored_moves for the current position are {node.explored_moves}")
 
@@ -417,8 +447,7 @@ def test5():
     origins = node.origins
     print(f"number of origins is {len(origins)}")
     print("the origins are")
-    for s in origins:
-        print(s)
+    node.print_origins()
 
     print(f"The explored_moves for the current position are {node.explored_moves}")
 
@@ -429,6 +458,8 @@ def test5():
 
 def test6():
     """ test case 6 """
+    print(" ")
+    print("Test case 6")
     pgn = open("../test_data/good_opening_white.pgn")
     game = chess.pgn.read_game(pgn)
     graph = Graph("w", game)
