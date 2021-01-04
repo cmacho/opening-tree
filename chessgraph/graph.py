@@ -75,7 +75,8 @@ class Graph(object):
         move_list = [board.san(child.move) for child in game_node.variations]
 
         self.add_moves(fen, move_list)
-        self.add_origin(fen, build_pgn_from_list_of_san_moves(list_of_sans), from_pgn=True)
+        if len(list_of_sans) > 0:
+            self.add_origin(fen, build_pgn_from_list_of_san_moves(list_of_sans), from_pgn=True)
 
         for child in game_node.variations:
             san = board.san(child.move)
@@ -208,7 +209,8 @@ class Graph(object):
             list_of_sans: (list) list of strings. The strings represent he moves that led to the current position in
             SAN format
         """
-        self.add_origin(fen, build_pgn_from_list_of_san_moves(list_of_sans))
+        if len(list_of_sans) > 0:
+            self.add_origin(fen, build_pgn_from_list_of_san_moves(list_of_sans))
 
         for san in self.get_moves(fen):
             new_fen = get_next_fen(fen, san)
@@ -407,7 +409,6 @@ def print_board(fen):
     """
     board = chess.Board(fen)
     print(board)
-
 
 def test1():
     """ test case 1"""
