@@ -6,7 +6,7 @@ import queue
 
 class Graph(object):
     """ a directed graph where nodes correspond to board positions and edges correspond to moves """
-    def __init__(self, color, game=None):
+    def __init__(self, color, game=None, verbose=0):
         """
         Args:
             color: (string) Either "w" or "b". The color for which the graph will represent an opening book.
@@ -15,12 +15,17 @@ class Graph(object):
             graph.
             game: (chess.pgn.Game) optional parameter. an opening tree loaded directly from a pgn using the chess.pgn
             library. If this argument is not None, then the Graph is initialized with the data from game.
+            verbose: (int) controls the verbosity of the __init__ function. If verbose > 0, information is printed.
         """
         self.dict = {}
         self.color = color
         if game is not None:
+            if verbose > 0:
+                print("consuming pgn data")
             self.consume_pgn_game(game)
-            self.saturate()
+            self.saturate(verbose=verbose)
+            if verbose > 0:
+                print("finding origins.")
             self.find_origins()
 
     def add_moves(self, fen, move_list):
@@ -129,23 +134,44 @@ class Graph(object):
         node = self.get_node(fen)
         node.add_origin(origin_string, from_pgn)
 
+    def get_number_of_origins(self, fen):
+        """ returns the number of origins and number of origins from pgn
+
+        Args:
+            fen: (string) the fen representation of a board position which appears in the graph and therefore in
+                self.dict. More specifically, fen is not in FEN format but in a reduced FEN format where the move clocks
+                are not included
+        Returns:
+            number_of_origins (int) the number of origins, i.e. number of lines in the opening graph that lead to
+                the position
+            num_origins_from_pgn (int) the number of origins that were found directly in pgn data
+        """
+        node = self.get_node(fen)
+        number_of_origins, num_origins_from_pgn =  node.get_number_of_origins()
+        return number_of_origins, num_origins_from_pgn
+
     def print_origins(self, fen):
         """print the origins of the position, adding 'pgn' to indicate that a line was found directly in the pgn.
 
         Args:
              fen: (string) the fen representation of a board position which appears in the graph and therefore in
-             self.dict. More specifically, fen is not in FEN format but in a reduced FEN format where the move clocks
-             are not included
+                self.dict. More specifically, fen is not in FEN format but in a reduced FEN format where the move clocks
+                are not included
         """
         node = self.get_node(fen)
         node.print_origins()
 
-    def saturate(self):
+    def saturate(self, verbose = 0):
         """ completes the DAG represented by self by adding any opponent move for which the resulting position is
             already a node in self. This can be thought of as a kind of 'completion' or 'closure' operation.
             In other words, we add additional edges that we can get 'for free' without having to evaluate
-            any positions. """
-        print("saturating.")
+            any positions.
+
+            Args:
+                verbose: (int) controls how much log information is printed.
+            """
+        if verbose > 0:
+            print("saturating.")
         opposite_color_fens = [fen for fen in self.dict if fen_to_color(fen) != self.color]
         for fen in opposite_color_fens:
             board = chess.Board(fen)
@@ -158,7 +184,11 @@ class Graph(object):
                 resulting_fen = relevant_fen_part(board.fen())
                 board.pop()
                 if resulting_fen in self.dict and san not in self.get_moves(fen):
-                    print(f"Adding {san} to {fen}")
+                    if verbose > 0:
+                        print(f"Adding {san} to {fen}")
+                    if verbose > 1:
+                        print_board(fen)
+                        print(" ")
                     self.add_moves(fen, [san])
 
     def find_origins(self):
@@ -280,6 +310,16 @@ class Node(object):
             if from_pgn:
                 self.num_pgn_origins += 1
 
+    def get_number_of_origins(self):
+        """ returns the number of origins and number of origins from pgn
+
+        Returns:
+            number_of_origins (int) the number of origins, i.e. number of lines in the opening graph that lead to
+            the position
+            num_origins_from_pgn (int) the number of origins that were found directly in pgn data
+        """
+        return len(self.origins), self.num_pgn_origins
+
     def print_origins(self):
         """print the lines in self.origins, adding 'pgn' to indicate that a line was found directly in the pgn.
         This is determined based on num_pgn_origins """
@@ -358,6 +398,17 @@ def build_pgn_from_list_of_san_moves(list_of_sans):
     return " ".join(new_list)
 
 
+def print_board(fen):
+    """ print the board corresponding to the position described by fen
+
+    Args:
+        fen: (string) the FEN (Forsyth-Edwards-Notation) representation of a chess position. More specifically, the
+            first four parts of a FEN, without the move-clocks
+    """
+    board = chess.Board(fen)
+    print(board)
+
+
 def test1():
     """ test case 1"""
     print(" ")
@@ -386,7 +437,7 @@ def test1():
     next_fen = get_next_fen(fen, explored_moves[0])
 
     print("new position:")
-    print(chess.Board(next_fen))
+    print_board(next_fen)
     print("explored moves for this new position:")
     explored_moves = graph.get_moves(next_fen)
     print(explored_moves)
@@ -438,10 +489,15 @@ def test4():
     """ test case 4"""
     print(" ")
     print("Test case 4")
+    print("loading good_opening_black.pgn:")
     pgn = open("../test_data/good_opening_black.pgn")
     game = chess.pgn.read_game(pgn)
-    _ = Graph("b", game)
+    _ = Graph("b", game, verbose=1)
 
+    print("loading good_opening_white.pgn:")
+    pgn = open("../test_data/good_opening_white.pgn")
+    game = chess.pgn.read_game(pgn)
+    _ = Graph("w", game, verbose=1)
 
 def test5():
     """ test case 5 """
@@ -455,7 +511,7 @@ def test5():
     print("getting origins for this position: ")
     print(fen)
     print("which looks like this:")
-    print(chess.Board(fen))
+    print_board(fen)
 
     node = graph.get_node(fen)
     origins = node.origins
@@ -476,7 +532,7 @@ def test5():
 
     print(f"getting origins for this position: {fen}")
     print("which looks like this:")
-    print(board)
+    print_board(fen)
 
     node = graph.get_node(fen)
     origins = node.origins
@@ -494,7 +550,7 @@ def test5():
     fen = "rn1qkb1r/ppp1pppp/8/3n1b2/3P4/5N2/PP1NPPPP/R1BQKB1R b KQkq -"
     print(f"getting origins for this position: {fen}")
     print("which looks like this:")
-    print(chess.Board(fen))
+    print_board(fen)
 
     node = graph.get_node(fen)
     origins = node.origins
