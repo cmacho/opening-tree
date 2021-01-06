@@ -23,7 +23,7 @@ def ask_for_input(prompt, options):
     Returns:
         the option selected by the user
     """
-    prompt_to_print = prompt
+    prompt_to_print = prompt + '\n'
     lowercase_options = [s.lower() for s in options]
     while True:
         user_input = input(prompt_to_print)
@@ -36,7 +36,7 @@ def ask_for_input(prompt, options):
             break
         else:
             print(f"Could not parse '{orig_user_input}'. Enter 'exit' in order to exit the program. \n")
-            prompt_to_print = prompt
+            prompt_to_print = prompt + '\n'
     for i, s in enumerate(lowercase_options):
         if user_input == s:
             return options[i]
@@ -45,7 +45,7 @@ def ask_for_input(prompt, options):
 
 def ask_to_enter_anything(prompt, options):
     lowercase_options = [s.lower() for s in options]
-    user_input = input(prompt)
+    user_input = input(prompt + '\n')
     user_input = user_input.lower().strip()
     check_exit(user_input)
     for i, s in enumerate(lowercase_options):
