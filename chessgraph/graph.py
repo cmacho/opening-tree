@@ -27,6 +27,7 @@ class Graph(object):
             if verbose > 0:
                 print("finding origins.")
             self.find_origins()
+            self.check_all_leaves_are_opponent_color()
 
     def add_moves(self, fen, move_list):
         """ Add the moves in move_list to the node corrsponding to the board position represented by fen. Create the
@@ -248,6 +249,12 @@ class Graph(object):
                     explored_fens.add(new_fen)
 
         return num_leaves, num_nodes
+
+    def check_all_leaves_are_opponent_color(self):
+        for fen in self.dict:
+            if self.get_degree(fen) == 0 and fen_to_color(fen) == self.color:
+                origin = self.get_node(fen).origins[0]
+                raise BadOpeningGraphError(f"Line {origin} ends in leaf of own color.")
 
 
 class BadOpeningGraphError(Exception):
@@ -487,7 +494,7 @@ def test3():
 
 
 def test4():
-    """ test case 4"""
+    """ test case 4: loading two good pgns with verbose=1 """
     print(" ")
     print("Test case 4")
     print("loading good_opening_black.pgn:")
@@ -499,6 +506,7 @@ def test4():
     pgn = open("../test_data/good_opening_white.pgn")
     game = chess.pgn.read_game(pgn)
     _ = Graph("w", game, verbose=1)
+
 
 def test5():
     """ test case 5 """
@@ -584,8 +592,28 @@ def test6():
     print("num_nodes", num_nodes)
 
 
+
+def test7():
+    """ test case 7: loading a pgn that contains a leaf of own color. """
+    print(" ")
+    print("Test case 7")
+    pgn = open("../test_data/bad_opening_black.pgn")
+    game = chess.pgn.read_game(pgn)
+
+    print("trying to consume bad_opening_black.pgn")
+
+    try:
+        _ = Graph("b", game)
+    except BadOpeningGraphError as err:
+        print("successfully caught Error.")
+        print("The error says:", err)
+    else:
+        raise Exception("should not reach here. BadOpeningGraphError was not successfully raised and caught")
+
+
+
 def run_tests():
-    tests = [test1, test2, test3, test4, test5, test6]
+    tests = [test1, test2, test3, test4, test5, test6, test7]
     for test in tests:
         test()
 

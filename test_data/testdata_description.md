@@ -3,3 +3,6 @@
   these two lines:
     - 1. d4 e6 2. e4 c5 3. d5 Nf6 4. Nc3 d6 5. dxe6 fxe6 6. Nf3
 	- 1. d4 c5 2. d5 Nf6 3. Nc3 d6 4. e4 e6 5. dxe6 fxe6 6. Bf4
+* bad_opening_black.pgn: contains a leaf where black is to move.
+* good_opening_white: should work fine. It is an older version of data/opening_white.pgn
+* good_opening_black: should work fine. It is an older verison of data/opening_black.pgn
