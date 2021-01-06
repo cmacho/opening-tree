@@ -349,10 +349,11 @@ def weighted_random_choice(choices, weights):
     """ returns one of the elements of choices at random where the probability for each choices[i] is proportional to
     weights[i]"""
     random_number = random.random()
-    total = 0
+    total_weight = sum(weights)
+    aggregate = 0
     for i, element in enumerate(choices):
-        total = total + weights[i]
-        if total > random_number:
+        aggregate = aggregate + weights[i]
+        if aggregate / total_weight > random_number:
             return element
     raise Exception(f"should not reach here. weights is {weights}.")
 
