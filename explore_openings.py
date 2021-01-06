@@ -215,7 +215,7 @@ def practice_openings(params):
                 print(f"{user_input} is wrong. The correct move is {correct_san}.")
                 _ = ask_to_enter_anything("Press enter to continue.", [])
                 fen = params['fen']
-                list_of_sans = params['list_of_sans']
+                list_of_sans = params['list_of_sans'].copy()
                 continue
 
         else:  # opponent's move
@@ -236,13 +236,13 @@ def practice_openings(params):
                 user_input = ask_to_enter_anything("Press enter to continue.", general_options)
                 if user_input is None:
                     fen = params['fen']
-                    list_of_sans = params['list_of_sans']
+                    list_of_sans = params['list_of_sans'].copy()
                     continue
 
         assert user_input is not None
         if user_input == 'restart':
             fen = params['fen']
-            list_of_sans = params['list_of_sans']
+            list_of_sans = params['list_of_sans'].copy()
             continue
         elif user_input == 'explore':
             params['mode'] = 'explore'
