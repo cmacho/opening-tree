@@ -128,8 +128,8 @@ def explore_tree(params):
             else:
                 print_which_color_to_move(fen)
                 prompt = "Press Enter to continue." + " " + general_prompts
-                params = general_options
-                user_input = ask_to_enter_anything(prompt, params)
+                options = general_options
+                user_input = ask_to_enter_anything(prompt, options)
             if user_input is None:
                 moves = graph.get_moves(fen)
                 assert len(moves) == 1
@@ -171,10 +171,12 @@ def explore_tree(params):
         elif user_input == 'lookup':
             params['mode'] = 'lookup'
             params['fen'] = fen
+            params['list_of_sans'] = list_of_sans
             return params
         elif user_input == 'practice':
             params['mode'] = 'practice'
             params['fen'] = fen
+            params['list_of_sans'] = list_of_sans
             return params
         else:
             raise Exception(f"Should not reach here. Variable user_input has value {user_input}.")
