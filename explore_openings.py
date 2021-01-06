@@ -213,10 +213,9 @@ def practice_openings(params):
 
             elif user_input in legal_moves:
                 print(f"{user_input} is wrong. The correct move is {correct_san}.")
-                _ = ask_to_enter_anything("Press enter to continue.", [])
-                fen = params['fen']
-                list_of_sans = params['list_of_sans'].copy()
-                continue
+                user_input = ask_to_enter_anything("Press enter to continue.", general_options)
+                if user_input is None:
+                    user_input = 'restart'
 
         else:  # opponent's move
             # opponent chooses move at random where the probability for each choice is proportional to the number
