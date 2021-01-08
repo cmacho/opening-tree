@@ -116,8 +116,8 @@ def explore_tree(params):
         if not skip_print:
             print_basic_position_information(graph, fen, list_of_sans, include_number_of_origins=True)
 
-        general_options = ['back', 'origin', 'lookup', 'practice']
-        general_prompts = "Enter 'back' to go back to previous position.\n" \
+        general_options = ['b', 'origin', 'lookup', 'practice']
+        general_prompts = "Enter 'b' to go back to previous position.\n" \
                           "Enter 'origin' to print the origins of this position. " \
                           "Enter 'lookup' in order to look up a position." \
                           "Enter 'practice' in order to practice from this position."
@@ -154,7 +154,7 @@ def explore_tree(params):
                 list_of_sans.append(user_input)
                 fen = chessgraph.get_next_fen(fen, user_input)
                 continue
-        if user_input == 'back':
+        if user_input == 'b':
             if len(stack) > 0:
                 fen = stack.pop()
                 list_of_sans.pop()
