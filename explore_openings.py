@@ -296,7 +296,7 @@ def look_up_position(params):
             if len(list_of_sans) > 0:
                 list_of_sans.pop()
                 board.pop()
-                fen = board.fen()
+                fen = chessgraph.relevant_fen_part(board.fen())
             else:
                 print("Cannot go back. This is already the starting position.")
         elif user_input == 'origin':
