@@ -119,7 +119,7 @@ def explore_tree(params):
         general_options = ['b', 'origin', 'lookup', 'practice']
         general_prompts = "Enter 'b' to go back to previous position.\n" \
                           "Enter 'origin' to print the origins of this position. " \
-                          "Enter 'lookup' in order to look up a position." \
+                          "Enter 'lookup' in order to look up a position. " \
                           "Enter 'practice' in order to practice from this position."
         if chessgraph.fen_to_color(fen) == graph.color:
             skip_print = False
@@ -258,7 +258,65 @@ def practice_openings(params):
 
 
 def look_up_position(params):
-    pass
+    graph = params['graph']
+    list_of_sans = params['list_of_sans']
+    fen = params['fen']
+
+    board = chess.Board()
+    for san in list_of_sans:
+        board.push_san(san)
+
+    skip_print_and_lookup = False
+
+    while True:
+        if not skip_print_and_lookup:
+            print_basic_position_information(graph, fen, list_of_sans, include_number_of_origins=False)
+            if graph.color == 'w':
+                color_word = 'white'
+            else:
+                color_word = 'black'
+            question = "Is position part of " + color_word + " opening graph?"
+            if graph.node_exists(fen):
+                print(question, "Yes.")
+                print("Enter 'explore' to enter exploration mode. Enter 'practice' to practice from this position.\n"
+                      "Enter 'origin' in order to see origins for this position.")
+                options = ['practice', 'origin', 'explore', 'b'] + list_of_legal_moves(fen)
+            else:
+                print(question, "No.")
+                options = ['b'] + list_of_legal_moves(fen)
+        skip_print_and_lookup = False
+        prompt = "Enter a move in SAN format. Enter 'b' to go back. "
+        user_input = ask_for_input(prompt, options)
+
+        if user_input in list_of_legal_moves(fen):
+            board.push_san(user_input)
+            list_of_sans.append(user_input)
+            fen = chessgraph.relevant_fen_part(board.fen())
+        elif user_input == 'b':
+            if len(list_of_sans) > 0:
+                list_of_sans.pop()
+                board.pop()
+                fen = board.fen()
+            else:
+                print("Cannot go back. This is already the starting position.")
+        elif user_input == 'origin':
+            print("Lines leading to this positon:")
+            graph.print_origins(fen)
+            print(" ")
+            skip_print_and_lookup = True
+        else:
+            assert graph.node_exists(fen)
+            params['fen'] = fen
+            # since current list_of_sans may not be part of opening tree, parse new list of sans from origin string
+            origin_string = graph.get_first_origin(fen)
+            params['list_of_sans'] = chessgraph.build_list_of_san_moves_from_origin_string(origin_string)
+            if user_input == 'practice':
+                params['mode'] = 'practice'
+            elif user_input == 'explore':
+                params['mode'] = 'explore'
+            else:
+                raise Exception(f"Should not reach here. user_input is {user_input}.")
+            return params
 
 
 def print_basic_position_information(graph, fen, list_of_sans, include_number_of_origins=False):

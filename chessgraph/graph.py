@@ -163,6 +163,22 @@ class Graph(object):
         node = self.get_node(fen)
         node.print_origins()
 
+    def get_first_origin(self, fen):
+        """ returns the first origin string of the node corresponding to fen
+
+        Args:
+            fen: (string) the fen representation of a board position which appears in the graph and therefore in
+                self.dict. More specifically, fen is not in FEN format but in a reduced FEN format where the move clocks
+                are not included
+
+        Returns:
+            origin_string (string): the first origin string of the board position. It is guaranteed to be part of the
+            pgn that was used to create the opening graph.
+        """
+        node = self.get_node(fen)
+        origin_string = node.get_first_origin()
+        return origin_string
+
     def saturate(self, verbose = 0):
         """ completes the DAG represented by self by adding any opponent move for which the resulting position is
             already a node in self. This can be thought of as a kind of 'completion' or 'closure' operation.
@@ -338,6 +354,16 @@ class Node(object):
             else:
                 print(s)
 
+    def get_first_origin(self):
+        """ returns the first origin
+
+        Returns:
+            origin_string (string): the first origin for the node. It is guaranteed to be part of the pgn that was
+            used to create the opening graph.
+        """
+        return self.origins[0]
+
+
 
 def fen_to_color(fen):
     """ Extract the color of whose turn it is from a fen representation of a board position
@@ -407,6 +433,24 @@ def build_pgn_from_list_of_san_moves(list_of_sans):
     return " ".join(new_list)
 
 
+def build_list_of_san_moves_from_origin_string(origin_string):
+    """ parses a string that represents a sequence of moves into a list containing the sequence of moves
+
+    Args:
+        origin_string (string): the first few moves of a possible chess game in pgn format. However, in contrast to
+        more general pgns, no branching is allowed here.
+    Return:
+        list_of_sans (list): the elements of the list are strings. The strings are the same chess moves in SAN format
+        as the ones in origin_string.
+    """
+    list_of_sans = []
+    tokens = origin_string.split()
+    for token in tokens:
+        if not token[0].isnumeric():
+            list_of_sans.append(token)
+    return list_of_sans
+
+
 def print_board(fen):
     """ print the board corresponding to the position described by fen
 
@@ -416,6 +460,7 @@ def print_board(fen):
     """
     board = chess.Board(fen)
     print(board)
+
 
 def test1():
     """ test case 1"""
