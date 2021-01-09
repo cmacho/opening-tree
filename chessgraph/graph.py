@@ -164,12 +164,13 @@ class Graph(object):
         node.print_origins()
 
     def get_first_origin(self, fen):
-        """ returns the first origin string of the node corresponding to fen
+        """ returns the first origin string of the node corresponding to fen. Requires that fen is not the initial
+        board position
 
         Args:
             fen: (string) the fen representation of a board position which appears in the graph and therefore in
                 self.dict. More specifically, fen is not in FEN format but in a reduced FEN format where the move clocks
-                are not included
+                are not included. fen must not be the initial board position.
 
         Returns:
             origin_string (string): the first origin string of the board position. It is guaranteed to be part of the
@@ -355,8 +356,10 @@ class Node(object):
                 print(s)
 
     def get_first_origin(self):
-        """ returns the first origin
-
+        """ returns the first origin, if it exists. Otherwise, throw index error.
+        Under normal circumstances, an origin should exist for every node except the root of the graph, which represents
+        the initial board position.
+    
         Returns:
             origin_string (string): the first origin for the node. It is guaranteed to be part of the pgn that was
             used to create the opening graph.

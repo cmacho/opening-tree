@@ -308,8 +308,11 @@ def look_up_position(params):
             assert graph.node_exists(fen)
             params['fen'] = fen
             # since current list_of_sans may not be part of opening tree, parse new list of sans from origin string
-            origin_string = graph.get_first_origin(fen)
-            params['list_of_sans'] = chessgraph.build_list_of_san_moves_from_origin_string(origin_string)
+            if len(list_of_sans) > 0:
+                origin_string = graph.get_first_origin(fen)
+                params['list_of_sans'] = chessgraph.build_list_of_san_moves_from_origin_string(origin_string)
+            else:
+                params['list_of_sans'] = []
             if user_input == 'practice':
                 params['mode'] = 'practice'
             elif user_input == 'explore':
