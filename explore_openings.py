@@ -64,6 +64,8 @@ def main():
     color = ask_for_input(f"Enter 'b' or 'w' to indicate which color you want play as",
                           ['b', 'w'])
     params['list_of_sans'] = []
+    params['max_depth'] = 40
+    params['move_selection'] = 'uniform'
 
     if color == 'b':
         pgn = open("data/opening_black.pgn")
@@ -193,7 +195,7 @@ def practice_openings(params):
     graph = params['graph']
     fen = params['fen']
     list_of_sans = params['list_of_sans'].copy()
-    general_options = ['restart', 'explore', 'lookup']
+    general_options = ['restart', 'explore', 'lookup', 'depth', 'move_selection']
     while True:
         if chessgraph.fen_to_color(fen) == graph.color:
             print_basic_position_information(graph, fen, list_of_sans)
@@ -203,7 +205,8 @@ def practice_openings(params):
             assert correct_san in legal_moves
             options = legal_moves + general_options
             prompt = "Enter your move.\n" \
-                     "Or enter 'restart' to restart. Enter 'explore' or 'lookup' to switch to a different mode."
+                     "Or enter 'restart' to restart. Enter 'explore' or 'lookup' to switch to a different mode.\n" \
+                     "Enter 'depth' to change the maximum depth or 'move_selection' to change the move selection mode."
             user_input = ask_for_input(prompt, options)
 
             if user_input == correct_san:
@@ -221,15 +224,26 @@ def practice_openings(params):
             # opponent chooses move at random where the probability for each choice is proportional to the number
             # of leaves in the subgraph corresponding to that choice
             print_basic_position_information(graph, fen, list_of_sans)
-            if graph.get_degree(fen) > 0:
+            if graph.get_degree(fen) > 0 and len(list_of_sans) < 2 * params['max_depth'] - 1:
                 move_list = graph.get_moves(fen)
-                stats = stats_for_moves(graph, fen)
-                weights = [stats[san][1] for san in move_list]
-                san = weighted_random_choice(move_list, weights)
-
+                if params['move_selection'] == 'uniform':
+                    san = random.choice(move_list)
+                elif params['move_selection'] == 'random-leaf':
+                    stats = stats_for_moves(graph, fen)
+                    weights = [stats[san][1] for san in move_list]
+                    san = weighted_random_choice(move_list, weights)
+                else:
+                    raise Exception(f"Should not reach here. params['move_selection'] is {params['move_selection']}")
                 fen = chessgraph.get_next_fen(fen, san)
                 list_of_sans.append(san)
                 continue
+            elif len(list_of_sans) >= 2 * params['max_depth'] - 1:
+                print("Success!! You reached the maximum depth. Enter 'depth' in order to change the max depth.")
+                user_input = ask_to_enter_anything("Press enter to continue.", general_options)
+                if user_input is None:
+                    fen = params['fen']
+                    list_of_sans = params['list_of_sans'].copy()
+                    continue
             else:
                 print("Success!! You reached a leaf. There are no more explored moves in this line.")
                 user_input = ask_to_enter_anything("Press enter to continue.", general_options)
@@ -243,6 +257,19 @@ def practice_openings(params):
             fen = params['fen']
             list_of_sans = params['list_of_sans'].copy()
             continue
+        elif user_input == 'depth':
+            depth_input = ask_for_input("Please enter a number in order to change the maximum depth to that number.",
+                                        [str(x) for x in range(0, 101)])
+            if depth_input == '0' or depth_input == '1':
+                print("Depth needs to be at least 2.")
+            else:
+                assert int(depth_input) in range(2, 101)
+                params['max_depth'] = int(depth_input)
+        elif user_input == 'move_selection':
+            move_selection_input = ask_for_input("Please pick a move selection mode, how your opponent will select "
+                                                 "her moves. The options are 'random-leaf' and 'uniform'.",
+                                                 ['uniform', 'random-leaf'])
+            params['move_selection'] = move_selection_input
         elif user_input == 'explore':
             params['mode'] = 'explore'
             params['fen'] = fen
