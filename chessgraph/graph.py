@@ -6,23 +6,25 @@ import queue
 
 class Graph(object):
     """ a directed graph where nodes correspond to board positions and edges correspond to moves """
-    def __init__(self, color, game=None, verbose=0):
+    def __init__(self, color, games=[], verbose=0):
         """
         Args:
             color: (string) Either "w" or "b". The color for which the graph will represent an opening book.
             For chess positions where this color is to move, there should always only be one move in the opening book.
             When the opposite color is to move, there can be multiple possible moves that are explored through the
             graph.
-            game: (chess.pgn.Game) optional parameter. an opening tree loaded directly from a pgn using the chess.pgn
-            library. If this argument is not None, then the Graph is initialized with the data from game.
+            games: (chess.pgn.Game) optional parameter. a list of chess.pgn.Game objects. Each game in the list is
+            an opening tree loaded directly from a pgn using the chess.pgn library. If games is not the empty list, then
+            the Graph is initialized with the data from the games.
             verbose: (int) controls the verbosity of the __init__ function. If verbose > 0, information is printed.
         """
         self.dict = {}
         self.color = color
-        if game is not None:
+        if len(games) > 0:
             if verbose > 0:
                 print("consuming pgn data")
-            self.consume_pgn_game(game)
+            for game in games:
+                self.consume_pgn_game(game)
             self.saturate(verbose=verbose)
             if verbose > 0:
                 print("finding origins.")
@@ -469,10 +471,10 @@ def test1():
     """ test case 1"""
     print(" ")
     print("Test case 1")
-    pgn = open("../test_data/good_opening_white.pgn")
-    game = chess.pgn.read_game(pgn)
+    with open("../test_data/good_opening_white.pgn") as pgn:
+        game = chess.pgn.read_game(pgn)
 
-    graph = Graph("w", game)
+    graph = Graph("w", [game])
 
     # get FEN of the position after 1. d4 d5
     board = chess.Board()
@@ -509,13 +511,13 @@ def test2():
     """ test case 2"""
     print(" ")
     print("Test case 2")
-    pgn = open("../test_data/very_bad_opening_white.pgn")
-    game = chess.pgn.read_game(pgn)
+    with open("../test_data/very_bad_opening_white.pgn") as pgn:
+        game = chess.pgn.read_game(pgn)
 
     print("trying to consume very_bad_opening_white.pgn")
 
     try:
-        _ = Graph("w", game)
+        _ = Graph("w", [game])
     except BadOpeningGraphError as err:
         print("successfully caught Error.")
         print("The error says:", err)
@@ -527,13 +529,13 @@ def test3():
     """ test case 3 """
     print(" ")
     print("Test case 3")
-    pgn = open("../test_data/bad_opening_white.pgn")
-    game = chess.pgn.read_game(pgn)
+    with open("../test_data/bad_opening_white.pgn") as pgn:
+        game = chess.pgn.read_game(pgn)
 
     print("trying to consume bad_opening_white.pgn")
 
     try:
-        _ = Graph("w", game)
+        _ = Graph("w", [game])
     except BadOpeningGraphError as err:
         print("successfully caught Error.")
         print("The error says:", err)
@@ -546,23 +548,23 @@ def test4():
     print(" ")
     print("Test case 4")
     print("loading good_opening_black.pgn:")
-    pgn = open("../test_data/good_opening_black.pgn")
-    game = chess.pgn.read_game(pgn)
-    _ = Graph("b", game, verbose=1)
+    with open("../test_data/good_opening_black.pgn") as pgn:
+        game = chess.pgn.read_game(pgn)
+    _ = Graph("b", [game], verbose=1)
 
     print("loading good_opening_white.pgn:")
-    pgn = open("../test_data/good_opening_white.pgn")
-    game = chess.pgn.read_game(pgn)
-    _ = Graph("w", game, verbose=1)
+    with open("../test_data/good_opening_white.pgn") as pgn:
+        game = chess.pgn.read_game(pgn)
+    _ = Graph("w", [game], verbose=1)
 
 
 def test5():
     """ test case 5 """
     print(" ")
     print("Test case 5")
-    pgn = open("../test_data/good_opening_white.pgn")
-    game = chess.pgn.read_game(pgn)
-    graph = Graph("w", game)
+    with open("../test_data/good_opening_white.pgn") as pgn:
+        game = chess.pgn.read_game(pgn)
+    graph = Graph("w", [game])
 
     fen = "rnbqkb1r/pp4pp/3ppn2/2p5/4P3/2N5/PPP2PPP/R1BQKBNR w KQkq -"
     print("getting origins for this position: ")
@@ -626,9 +628,9 @@ def test6():
     """ test case 6 """
     print(" ")
     print("Test case 6")
-    pgn = open("../test_data/good_opening_white.pgn")
-    game = chess.pgn.read_game(pgn)
-    graph = Graph("w", game)
+    with open("../test_data/good_opening_white.pgn") as pgn:
+        game = chess.pgn.read_game(pgn)
+    graph = Graph("w", [game])
 
     initial_fen = relevant_fen_part(chess.STARTING_FEN)
     num_leaves, num_nodes = graph.compute_stats(initial_fen)
@@ -645,13 +647,13 @@ def test7():
     """ test case 7: loading a pgn that contains a leaf of own color. """
     print(" ")
     print("Test case 7")
-    pgn = open("../test_data/bad_opening_black.pgn")
-    game = chess.pgn.read_game(pgn)
+    with open("../test_data/bad_opening_black.pgn") as pgn:
+        game = chess.pgn.read_game(pgn)
 
     print("trying to consume bad_opening_black.pgn")
 
     try:
-        _ = Graph("b", game)
+        _ = Graph("b", [game])
     except BadOpeningGraphError as err:
         print("successfully caught Error.")
         print("The error says:", err)

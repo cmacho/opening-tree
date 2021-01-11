@@ -68,11 +68,13 @@ def main():
     params['move_selection'] = 'uniform'
 
     if color == 'b':
-        pgn = open("data/opening_black.pgn")
+        filename = "data/opening_black.pgn"
     else:
-        pgn = open("data/opening_white.pgn")
-    game = chess.pgn.read_game(pgn)
-    params['graph'] = chessgraph.Graph(color, game)
+        filename = "data/opening_white.pgn"
+    with open(filename) as pgn:
+        game = chess.pgn.read_game(pgn)
+
+    params['graph'] = chessgraph.Graph(color, [game])
 
     start_mode_based_on_options(params)
 
