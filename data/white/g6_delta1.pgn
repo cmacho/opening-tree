@@ -1,0 +1,11 @@
+[Event "?"]
+[Site "?"]
+[Date "2021.01.12"]
+[Round "?"]
+[White "White"]
+[Black "Black"]
+[Result "*"]
+
+1. d4 g6 2. e4 Bg7 3. Nc3 Nc6 4. Be3 {EV: 66.5%, N: 95.13% of 10.0M} d6 {EV:
+33.6%, N: 97.31% of 10.0M} 5. Qd2 {EV: 66.6%, N: 83.73% of 9.9M} a6 {EV: 33.8%,
+N: 78.09% of 8.6M} 6. O-O-O {EV: 66.4%, N: 44.83% of 10.0M} *
