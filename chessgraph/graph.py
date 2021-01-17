@@ -6,7 +6,7 @@ import queue
 
 class Graph(object):
     """ a directed graph where nodes correspond to board positions and edges correspond to moves """
-    def __init__(self, color, games=[], verbose=0):
+    def __init__(self, color, games, verbose=0):
         """
         Args:
             color: (string) Either "w" or "b". The color for which the graph will represent an opening book.
@@ -151,7 +151,7 @@ class Graph(object):
             num_origins_from_pgn (int) the number of origins that were found directly in pgn data
         """
         node = self.get_node(fen)
-        number_of_origins, num_origins_from_pgn =  node.get_number_of_origins()
+        number_of_origins, num_origins_from_pgn = node.get_number_of_origins()
         return number_of_origins, num_origins_from_pgn
 
     def print_origins(self, fen):
@@ -182,7 +182,20 @@ class Graph(object):
         origin_string = node.get_first_origin()
         return origin_string
 
-    def saturate(self, verbose = 0):
+    def get_origins(self, fen):
+        """ returns the list of origins for the board position represented by fen
+
+        Args:
+            fen: (string) the fen representation of a board position which appears in the graph and therefore in
+                self.dict. More specifically, fen is not in FEN format but in a reduced FEN format where the move clocks
+                are not included. fen must not be the initial board position.
+
+        Returns: (list) a list of strings. The strings represent the sequence of moves needed to get to the
+         board position while staying within the graph. """
+        node = self.get_node(fen)
+        return node.get_origins()
+
+    def saturate(self, verbose=0):
         """ completes the DAG represented by self by adding any opponent move for which the resulting position is
             already a node in self. This can be thought of as a kind of 'completion' or 'closure' operation.
             In other words, we add additional edges that we can get 'for free' without having to evaluate
@@ -238,8 +251,7 @@ class Graph(object):
             self.find_origins_in_subgraph(new_fen, list_of_sans)
             list_of_sans.pop()
 
-
-    def breadth_first(self,fen):
+    def breadth_first(self, fen):
         """  a generator that iterates through the graph breadt first, starting at fen.
 
         Args:
@@ -287,6 +299,21 @@ class Graph(object):
             if self.get_degree(fen) == 0 and fen_to_color(fen) == self.color:
                 origin = self.get_node(fen).origins[0]
                 raise BadOpeningGraphError(f"Line {origin} ends in leaf of own color.")
+
+    def number_of_moves(self, fen):
+        """ returns the total number of moves that have been played to reach the position fen
+
+        Args:
+            fen (string): A fen representation of a board position such that fen is one of the keys of self.dict
+
+        Returns:
+            num_moves (int): The number of moves by both players that have been played in order to reach the position
+        """
+        if fen == relevant_fen_part(chess.STARTING_FEN):
+            return 0
+        first_origin = self.get_first_origin(fen)
+        list_of_sans = build_list_of_san_moves_from_origin_string(first_origin)
+        return len(list_of_sans)
 
 
 class BadOpeningGraphError(Exception):
@@ -381,6 +408,12 @@ class Node(object):
         """
         return self.origins[0]
 
+    def get_origins(self):
+        """ returns the list of origins
+
+        Returns: (list) a list of strings. The strings represent the sequence of moves needed to get to the
+         board position while staying within the graph. """
+        return self.origins.copy()
 
 
 def fen_to_color(fen):
@@ -655,7 +688,6 @@ def test6():
     print("num_nodes", num_nodes)
 
 
-
 def test7():
     """ test case 7: loading a pgn that contains a leaf of own color. """
     print(" ")
@@ -672,7 +704,6 @@ def test7():
         print("The error says:", err)
     else:
         raise Exception("should not reach here. BadOpeningGraphError was not successfully raised and caught")
-
 
 
 def run_tests():
