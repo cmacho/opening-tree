@@ -238,6 +238,30 @@ class Graph(object):
             self.find_origins_in_subgraph(new_fen, list_of_sans)
             list_of_sans.pop()
 
+
+    def breadth_first(self,fen):
+        """  a generator that iterates through the graph breadt first, starting at fen.
+
+        Args:
+            fen: (string) A fen representation of a board position that appears in the graph. The root of the subtree
+            to iterate through.
+
+        Yields:
+              curr_fen: (string) The fen representation of a board position that appears in the graph.
+        """
+        next_fens_to_look_at = queue.Queue()
+        next_fens_to_look_at.put(fen)
+        explored_fens = {fen}  # set of the fens that have already been looked at or added to queue
+
+        while not next_fens_to_look_at.empty():
+            curr_fen = next_fens_to_look_at.get()
+            for san in self.get_moves(curr_fen):
+                new_fen = get_next_fen(curr_fen, san)
+                if new_fen not in explored_fens:
+                    next_fens_to_look_at.put(new_fen)
+                    explored_fens.add(new_fen)
+            yield curr_fen
+
     def compute_stats(self, fen):
         """ Compute the number of nodes in the subgraph rooted at fen and the number of leaves in that subgraph
 
@@ -250,22 +274,11 @@ class Graph(object):
         """
         num_leaves = 0
         num_nodes = 0
-        next_fens_to_look_at = queue.Queue()
-        next_fens_to_look_at.put(fen)
-        explored_fens = {fen}  # set of the fens that have already been looked at or added to queue
-
-        while not next_fens_to_look_at.empty():
-            curr_fen = next_fens_to_look_at.get()
+        for curr_fen in self.breadth_first(fen):
             num_nodes += 1
-
             if self.get_degree(curr_fen) == 0:
                 assert len(self.get_moves(curr_fen)) == 0
                 num_leaves += 1
-            for san in self.get_moves(curr_fen):
-                new_fen = get_next_fen(curr_fen, san)
-                if new_fen not in explored_fens:
-                    next_fens_to_look_at.put(new_fen)
-                    explored_fens.add(new_fen)
 
         return num_leaves, num_nodes
 
