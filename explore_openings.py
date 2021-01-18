@@ -11,11 +11,12 @@ def check_exit(user_input):
     Args:
     user_input (string) a string entered by the user
     """
+    user_input = user_input.lower()
     if user_input in ['exit', 'quit']:
         exit(0)
 
 
-def ask_for_input(prompt, options):
+def ask_for_input(prompt, options, case_sensitive=True):
     """ Repeatedly print prompt asking for user input until user inputs one of the strings in option or enters 'exit'.
     If user entered one of the strings in options, return the user input
 
@@ -26,20 +27,25 @@ def ask_for_input(prompt, options):
         the option selected by the user
     """
     prompt_to_print = prompt + '\n'
-    lowercase_options = [s.lower() for s in options]
+    if not case_sensitive:
+        options_for_comparison = [s.lower() for s in options]
+    else:
+        options_for_comparison = options
     while True:
         user_input = input(prompt_to_print)
-        orig_user_input = user_input.strip()
-        user_input = user_input.lower().strip()
+        user_input = user_input.strip()
+        orig_user_input = user_input
+        if not case_sensitive:
+            user_input = user_input.lower()
         check_exit(user_input)
         if user_input == "":
             prompt_to_print = ""  # allow user to create white space by entering empty string
-        elif user_input in lowercase_options:
+        elif user_input in options_for_comparison:
             break
         else:
             print(f"Could not parse '{orig_user_input}'. Enter 'exit' in order to exit the program. \n")
             prompt_to_print = prompt + '\n'
-    for i, s in enumerate(lowercase_options):
+    for i, s in enumerate(options_for_comparison):
         if user_input == s:
             return options[i]
     raise Exception(f"should not reach here. user_input is {user_input}. options is {options}.")
@@ -80,9 +86,9 @@ def main():
     params = {}
     params['fen'] = chessgraph.relevant_fen_part(chess.STARTING_FEN)
     params['mode'] = ask_for_input("Choose mode. Either 'practice' or 'explore'. or 'lookup'.",
-                                   ['practice', 'explore', 'lookup'])
+                                   ['practice', 'explore', 'lookup'], case_sensitive=False)
     color = ask_for_input(f"Enter 'b' or 'w' to indicate which color you want play as",
-                          ['b', 'w'])
+                          ['b', 'w'], case_sensitive=False)
     params['list_of_sans'] = []
     params['max_depth'] = 40
     params['move_selection'] = 'random-leaf'
@@ -319,7 +325,7 @@ def practice_openings(params):
         elif user_input == 'move_selection':
             move_selection_input = ask_for_input("Please pick a move selection mode, how your opponent will select "
                                                  "her moves. The options are 'random-leaf' and 'uniform'.",
-                                                 ['uniform', 'random-leaf'])
+                                                 ['uniform', 'random-leaf'], case_sensitive=False)
             params['move_selection'] = move_selection_input
         elif user_input == 'explore':
             params['mode'] = 'explore'
