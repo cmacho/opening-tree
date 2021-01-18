@@ -219,6 +219,16 @@ def practice_openings(params):
     general_options = ['restart', 'explore', 'lookup', 'depth', 'move_selection']
     own_moves_before_start = (len(list_of_sans) // 2 if graph.color == 'b' else (len(list_of_sans) + 1) // 2)
     opponent_moves = None  # opponent_moves will be a dict containing the opponent's moves for random-leaf mode
+
+    if own_moves_before_start >= params['max_depth']:
+        print("!!!")
+        print(f"!!! In the current starting position, {own_moves_before_start} moves have already been played,"
+              f"but the max depth for practice mode is currently set to {params['max_depth']}. Switching to explore "
+              f"mode.")
+        print("!!!")
+        user_input = ask_to_enter_anything("Press enter to continue.", general_options)
+        params['mode'] = 'explore'
+        return params
     while True:
         if opponent_moves is None and params['move_selection'] == 'random-leaf':
             leaf_list = leaves(graph, params['max_depth'], fen)
