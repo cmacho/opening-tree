@@ -309,6 +309,7 @@ class Graph(object):
         Returns:
             num_moves (int): The number of moves by both players that have been played in order to reach the position
         """
+        fen = relevant_fen_part(fen)
         if fen == relevant_fen_part(chess.STARTING_FEN):
             return 0
         first_origin = self.get_first_origin(fen)

@@ -85,7 +85,7 @@ def main():
                           ['b', 'w'])
     params['list_of_sans'] = []
     params['max_depth'] = 40
-    params['move_selection'] = 'uniform'
+    params['move_selection'] = 'random-leaf'
 
     if color == 'b':
         path = pathlib.Path("data/black")
@@ -217,7 +217,15 @@ def practice_openings(params):
     fen = params['fen']
     list_of_sans = params['list_of_sans'].copy()
     general_options = ['restart', 'explore', 'lookup', 'depth', 'move_selection']
+    own_moves_before_start = (len(list_of_sans) // 2 if graph.color == 'b' else (len(list_of_sans) + 1) // 2)
+    opponent_moves = None  # opponent_moves will be a dict containing the opponent's moves for random-leaf mode
     while True:
+        if opponent_moves is None and params['move_selection'] == 'random-leaf':
+            leaf_list = leaves(graph, params['max_depth'], fen)
+            target_leaf = random.choice(leaf_list)
+            origins_containing_fen = [origin for origin in graph.get_origins(target_leaf) if contains_fen(origin, fen)]
+            chosen_line = random.choice(origins_containing_fen)
+            opponent_moves = move_dict_from_origin(chosen_line)
         if chessgraph.fen_to_color(fen) == graph.color:
             print_basic_position_information(graph, fen, list_of_sans)
             move_list = graph.get_moves(fen)
@@ -250,9 +258,7 @@ def practice_openings(params):
                 if params['move_selection'] == 'uniform':
                     san = random.choice(move_list)
                 elif params['move_selection'] == 'random-leaf':
-                    stats = stats_for_moves(graph, fen)
-                    weights = [stats[san][1] for san in move_list]
-                    san = weighted_random_choice(move_list, weights)
+                    san = opponent_moves[fen]
                 else:
                     raise Exception(f"Should not reach here. params['move_selection'] is {params['move_selection']}")
                 fen = chessgraph.get_next_fen(fen, san)
@@ -264,6 +270,7 @@ def practice_openings(params):
                 if user_input is None:
                     fen = params['fen']
                     list_of_sans = params['list_of_sans'].copy()
+                    opponent_moves = None
                     continue
             else:
                 print("Success!! You reached a leaf. There are no more explored moves in this line.")
@@ -271,21 +278,34 @@ def practice_openings(params):
                 if user_input is None:
                     fen = params['fen']
                     list_of_sans = params['list_of_sans'].copy()
+                    opponent_moves = None
                     continue
 
         assert user_input is not None
         if user_input == 'restart':
             fen = params['fen']
             list_of_sans = params['list_of_sans'].copy()
+            opponent_moves = None
             continue
         elif user_input == 'depth':
             depth_input = ask_for_input("Please enter a number in order to change the maximum depth to that number.",
                                         [str(x) for x in range(0, 101)])
             if depth_input == '0' or depth_input == '1':
                 print("Depth needs to be at least 2.")
+            elif int(depth_input) <= own_moves_before_start:
+                print(f"Depth input needs to be at least {own_moves_before_start + 1}, since "
+                      f"{own_moves_before_start} have already been played by color {graph.color} "
+                      f"in the position that is currently set as the starting position for practice mode.")
             else:
                 assert int(depth_input) in range(2, 101)
                 params['max_depth'] = int(depth_input)
+                opponent_moves = None
+                # number of moves already played before the current position
+                already_played = (len(list_of_sans) // 2 if graph.color == 'b' else (len(list_of_sans) + 1) // 2)
+                if already_played >= params['max_depth']:
+                    print("This depth has been reached already. Restarting from the initial position.")
+                    fen = params['fen']
+                    list_of_sans = params['list_of_sans'].copy()
         elif user_input == 'move_selection':
             move_selection_input = ask_for_input("Please pick a move selection mode, how your opponent will select "
                                                  "her moves. The options are 'random-leaf' and 'uniform'.",
@@ -400,6 +420,48 @@ def print_which_color_to_move(fen):
         raise Exception(f"Should not reach here. Variable color has value {color}.")
 
 
+def contains_fen(origin_string, fen):
+    """  returns True if the board position described by fen occurs during the sequence of moves described by
+      origin_string, False otherwise
+
+      Args:
+          origin_string: (string) a series of moves in SAN format starting from the initial board position
+          fen: (string) the fen representation of a board position which appears in the graph and therefore in
+            self.dict. More specifically, fen is not in FEN format but in a reduced FEN format where the move clocks
+            are not included
+      Returns:
+          (bool) boolean indicating whether the position occurs
+    """
+    fen = chessgraph.relevant_fen_part(fen)
+    list_of_sans = chessgraph.build_list_of_san_moves_from_origin_string(origin_string)
+    current_fen = chessgraph.relevant_fen_part(chess.STARTING_FEN)
+    if current_fen == fen:
+        return True
+    for san in list_of_sans:
+        current_fen = chessgraph.get_next_fen(current_fen, san)
+        if current_fen == fen:
+            return True
+    return False
+
+
+def move_dict_from_origin(origin_string):
+    """ returns a dict where the keys are all the positions occuring in the game described by origin_string except the
+    final position, and the the values are the next move for each position
+
+    Args:
+        origin_string (string): a series of moves in SAN format starting from the initial board position
+    Returns:
+        move_dict (dict): maps board positions to the next move as it occurs in origin_string.
+    """
+    list_of_sans = chessgraph.build_list_of_san_moves_from_origin_string(origin_string)
+    move_dict = {}
+    current_fen = chessgraph.relevant_fen_part(chess.STARTING_FEN)
+    for san in list_of_sans:
+        move_dict[current_fen] = san
+        current_fen = chessgraph.get_next_fen(current_fen, san)
+    return move_dict
+
+
 def print_explored_moves_and_statistics(graph, fen):
     """ print the explored moves in graph for position fen as well as the number of children,
     leaves and nodes below the nodes resulting from the move. Since this function is always called
@@ -438,6 +500,31 @@ def stats_for_moves(graph, fen):
         num_leaves, num_nodes = graph.compute_stats(new_fen)
         stats[san] = (num_children, num_leaves, num_nodes)
     return stats
+
+
+def leaves(graph, depth, fen):
+    """  returns a list of the nodes at which practice mode can end. Specifically, these are nodes that lie below fen
+    in the graph and either represent a position where the depth'th move of the color graph.color has just been played,
+    or are a leaf in the graph.
+
+    Args:
+        graph (chessgraph.Graph): the opening graph we are considering
+        depth (int): The current setting to what depth we practice in practice mode
+        fen (string): The fen representation of the board position at which practice mode is rooted
+
+    Returns:
+        leaf_list (list) : a list of strings. Each string is the fen representation of a board position
+    """
+    leaf_list = []
+    for curr_fen in graph.breadth_first(fen):
+        num_moves = graph.number_of_moves(curr_fen)
+        if num_moves > 2 * depth:
+            break
+        if graph.get_degree(curr_fen) == 0:  # leaf
+            leaf_list.append(curr_fen)
+        elif num_moves > 2 * (depth - 1) and chessgraph.fen_to_color(curr_fen) != graph.color:
+            leaf_list.append(curr_fen)
+    return leaf_list
 
 
 def list_of_legal_moves(fen):
