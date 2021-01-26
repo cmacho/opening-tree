@@ -7,5 +7,5 @@
 [Result "*"]
 
 1. d4 Nf6 2. f3 (2. c4 e6 3. e3 b6 4. Bd3 d5 5. Nf3 Bb7 6. O-O Bd6) (2. Bf4 d5
-3. Nf3 e6 4. e3 c5 5. Nbd2 Qb6 6. Rb1 Bd6 7. dxc5 Qxc5) d5 3. e4 dxe4 4. Nc3 (
-4. fxe4 e5 5. Nf3 exd4 6. e5 Ng4) exf3 5. Nxf3 c6 *
+3. Nf3 e6 4. e3 c5 5. Nbd2 Qb6 6. Rb1 Bd6 7. dxc5 Qxc5) (2. Nf3 e6 3. Bf4 c5 4.
+e3 d5) d5 3. e4 dxe4 4. Nc3 (4. fxe4 e5 5. Nf3 exd4 6. e5 Ng4) exf3 5. Nxf3 c6 *
