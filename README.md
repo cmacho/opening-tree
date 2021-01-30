@@ -35,11 +35,11 @@ However, the chess position after the first eight moves is the same in both line
 In other cases, we can even add moves that did not appear in the input data at all, because they result in explored chess positions. For example, the input data in `data/white` may contain these two lines:
 ```
 1. d4 Nf6 2. c4
-1. d4 d5 2. c4 Nf6 3. Nf3
+1. d4 d5 2. c4 Nf6 3. cxd5
 ```
-Since playing the move `2. ... d5` after `1. d4 Nf6 2. c4` will result in the same position as `1. d4 d5 2. c4 Nf6`, we can automatically add `d5` to the explored moves for the position after `1. d4 Nf6 2. c4` and the graph will then also contain this opening:
+Since playing the move `2... d5` after `1. d4 Nf6 2. c4` will result in the same position as `1. d4 d5 2. c4 Nf6`, we can automatically add `d5` to the explored moves for the position after `1. d4 Nf6 2. c4` and the graph will then also contain this opening:
 ``` 
-1. d4 Nf6 2. c4 d5 3. Nf3
+1. d4 Nf6 2. c4 d5 3. cxd5
 ```
 
 ### Exploring the data
