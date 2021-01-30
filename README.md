@@ -32,8 +32,7 @@ However, the chess position after the first eight moves is the same in both line
 1. d4 Nf6 2. Bf4 d5 3. Nf3 e6 4. e3 c5 5. Nbd2 Qb6 6. Rb1 Bd6
 ```
 
-In other cases, we can even add moves that did not appear in the input data at all, because they result in explored chess positions. Example:
-The input data in `data/white` may contain these two lines:
+In other cases, we can even add moves that did not appear in the input data at all, because they result in explored chess positions. For example, the input data in `data/white` may contain these two lines:
 ```
 1. d4 Nf6 2. c4
 1. d4 d5 2. c4 Nf6 3. Nf3
