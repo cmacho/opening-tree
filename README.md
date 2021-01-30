@@ -45,7 +45,7 @@ Since playing the move `2. ... d5` after `1. d4 Nf6 2. c4` will result in the sa
 ### Exploring the data
 
 The tool has two modes for exploring the data:
-- In explore mode, you can navigate the tree / graph of chess openings. For every position where the opponent can make a move, you can see which moves are explored in our data, as well as some statistics about how many moves are explored after that move.
+- In explore mode, you can navigate the tree / graph of chess openings. For every position where the opponent can make a move, you can see which moves are explored in the data, as well as some statistics about how many moves are explored after that move.
 - In lookup mode, you can set up a position and then see whether it is part of the opening graph or not.
 
 ### Practice mode
