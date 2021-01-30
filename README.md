@@ -1,12 +1,12 @@
 ## Usage:
 
-Run 
+Run `explore_openings.py` from the command line by entering:
 ```
 python explore_openings.py
 ```
-from the command line.
 
-### About:
+
+## About:
 
 This is an interactive command line tool for exploring, learning and practicing the preferred chess openings of the powerful engine Leela Chess Zero ([Lc0](https://lczero.org/)). More specifically, we use the version of Lc0 that won the computer chess tournaments TCEC17 and CCC13 in 2020 (even though, in those tournaments, it could not use its own openings because openings were prescribed by the organizers of the tournament).
 
