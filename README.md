@@ -32,7 +32,7 @@ Here, the chess position after the first eight moves is the same in both lines. 
 1. d4 Nf6 2. Bf4 d5 3. Nf3 e6 4. e3 c5 5. Nbd2 Qb6 6. Rb1 Bd6
 ```
 
-<img src="imgs/data_processing_example1.png"/>
+<img src="imgs/data_processing_example1.png" width="400px"/>
 
 In other cases, we can even add moves that did not appear in the input data at all, because they result in explored chess positions. For example, the input data in `data/white` may contain these two lines:
 ```
@@ -44,7 +44,7 @@ Since playing the move `2... d5` after `1. d4 Nf6 2. c4` will result in the same
 1. d4 Nf6 2. c4 d5 3. cxd5
 ```
 
-<img src="imgs/data_processing_example2.png"/>
+<img src="imgs/data_processing_example2.png" width="400px"/>
 
 ### Exploring the data
 
