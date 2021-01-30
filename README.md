@@ -8,7 +8,7 @@ python explore_openings.py
 
 ## About:
 
-This is an interactive command line tool for exploring, learning and practicing the preferred chess openings of the powerful engine Leela Chess Zero ([Lc0](https://lczero.org/)). More specifically, we use the version of Lc0 that won the computer chess tournaments TCEC17 and CCC13 in 2020 (even though, in those tournaments, it could not use its own openings because openings were prescribed by the organizers of the tournament).
+This is an interactive command line tool for exploring, learning and practicing the preferred chess openings of the chess engine Leela Chess Zero ([Lc0](https://lczero.org/)). More specifically, we use the version of Lc0 that won the computer chess tournaments TCEC17 and CCC13 in 2020 (even though, in those tournaments, it could not use its own openings because openings were prescribed by the organizers of the tournament).
 
 Every move by Black in in `data/black` and every move by White in `data/white` was calculated using Lc0, using the same neural network weights file ([384x30-t60-3010.pb.gz](https://lczero.org/play/networks/bestnets/)) that won the TCEC17 and CCC13 tournaments, and running 10,000,000 simulations (i.e. evaluating 10,000,000 nodes) in order to decide on each move. See Deepmind's [paper](https://kstatic.googleusercontent.com/files/2f51b2a749a284c2e2dfa13911da965f4855092a179469aedd15fbe4efe8f8cbf9c515ef83ac03a6515fa990e6f85fd827dcd477845e806f23a17845072dc7bd) on AlphaZero for more details on the Monte Carlo Tree Search algorithm used by Lc0 (which is essentially an open source version of AlphaZero).
 
