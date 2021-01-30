@@ -27,7 +27,7 @@ The data in `data/black` may include the following two lines:
 1. d4 Nf6 2. Bf4 d5 3. Nf3 e6 4. e3 c5
 1. d4 Nf6 2. Nf3 e6 3. Bf4 c5 4. e3 d5 5. Nbd2 Qb6 6. Rb1 Bd6
 ```
-However, the chess position after `1. d4 Nf6 2. Bf4 d5 3. Nf3 e6 4. e3 c5` is the same as the position after `1. d4 Nf6 2. Nf3 e6 3. Bf4 c5 4. e3 d5`. Thus, by collapsing these nodes into one, the resulting graph will also contain this opening:
+However, the chess position after the first eight moves is the same in both lines. Thus, by collapsing these nodes into one, the resulting graph will also contain this opening:
 ```
 1. d4 Nf6 2. Bf4 d5 3. Nf3 e6 4. e3 c5 5. Nbd2 Qb6 6. Rb1 Bd6
 ```
