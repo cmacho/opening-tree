@@ -6,9 +6,15 @@
 [Black "Black"]
 [Result "*"]
 
-1. e4 e5 2. Nf3 Nc6 3. Bc4 (3. Nc3 Nf6 4. Bc4 (4. Bb5 Bb4 5. O-O O-O 6. d3 (6.
-Bxc6 dxc6 7. d3 Re8 8. Ne2 Nd7) Bxc3 7. bxc3 d6 8. Bg5 h6 9. Bh4 Qe7) Nxe4 5.
-Nxe4 d5 6. Bd3 dxe4 7. Bxe4 Bd6 8. d4 exd4 9. O-O O-O) Bc5 4. c3 Nf6 5. d4 exd4
-6. cxd4 Bb4+ 7. Bd2 (7. Nbd2 Bxd2+ 8. Bxd2 Nxe4 9. d5 Nxd2 10. Qxd2 Ne7 11. d6
-cxd6 12. Qxd6 O-O) Nxe4 8. Bxb4 Nxb4 9. Bxf7+ Kxf7 10. Qb3+ Ke8 11. Qxb4 Qe7 12.
-Qxe7+ Kxe7 13. O-O Kd8 *
+1. e4 e5 2. Nf3 (2. Bc4 Nf6 3. d4 exd4 4. Nf3 (4. Qxd4 Nc6 5. Qe3 Bb4+ 6. c3 Ba5
+7. Nf3 O-O 8. O-O Re8) (4. e5 d5 5. Bb3 (5. Bb5+ Bd7 6. Qxd4 Bxb5 7. exf6 Qxf6
+8. Qxf6 gxf6 9. Nc3 Bc6) (5. exd6 Bxd6 6. Qe2+ Qe7 7. Nf3 Qxe2+ 8. Bxe2 Nc6) (
+5. exf6 dxc4 6. Ne2 Nc6 7. fxg7 Bxg7) Ne4 6. Ne2 Bc5 7. O-O Nc6 8. Nf4 Be6 9.
+Nd2 Nxd2 10. Bxd2 Qd7) Bb4+ 5. c3 dxc3 6. bxc3 d5 7. exd5 Bd6 8. O-O O-O 9. Bg5
+Bg4 10. Nbd2 Nbd7) Nc6 3. Bc4 (3. Nc3 Nf6 4. Bc4 (4. Bb5 Bb4 5. O-O O-O 6. d3 (
+6. Bxc6 dxc6 7. d3 Re8 8. Ne2 Nd7) Bxc3 7. bxc3 d6 8. Bg5 h6 9. Bh4 Qe7) Nxe4 5.
+Nxe4 d5 6. Bd3 dxe4 7. Bxe4 Bd6 8. d4 exd4 9. O-O O-O) (3. d4 exd4 4. Bc4 Bb4+
+5. c3 dxc3 6. O-O Nf6 7. e5 d5 8. exf6 dxc4 9. fxg7 Rg8 10. Qxd8+ Kxd8 11. Bg5+
+Be7 12. Nxc3 Bxg5) Bc5 4. c3 Nf6 5. d4 exd4 6. cxd4 Bb4+ 7. Bd2 (7. Nbd2 Bxd2+
+8. Bxd2 Nxe4 9. d5 Nxd2 10. Qxd2 Ne7 11. d6 cxd6 12. Qxd6 O-O) Nxe4 8. Bxb4 Nxb4
+9. Bxf7+ Kxf7 10. Qb3+ Ke8 11. Qxb4 Qe7 12. Qxe7+ Kxe7 13. O-O Kd8 *
