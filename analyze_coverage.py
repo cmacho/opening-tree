@@ -13,8 +13,11 @@ def main():
                                      "explored and unexplored, "
                                      "given that we are using the moves from opening graph.")
     parser.add_argument("color", choices=["b", "w"], help="Choose 'b' for black or 'w' for white.")
+    parser.add_argument("--database", choices=["lichess", "master"], default="lichess",
+                        help="Use either database of masters games or larger database of lichess games")
     args = parser.parse_args()
     color = args.color
+    database = args.database
 
     if args.color == 'b':
         path = pathlib.Path("data/black")
@@ -22,7 +25,7 @@ def main():
         path = pathlib.Path("data/white")
     games_list = read_pgn_files_in_directory(path)
     graph = chessgraph.Graph(args.color, games_list)
-    api_service = LichessExplorerService()
+    api_service = LichessExplorerService(database=database)
     position_probabilities = {}
 
     count_explored_positions = initialize_explored_positions(position_probabilities, graph)
@@ -33,7 +36,7 @@ def main():
 
     now = datetime.now()
     datetime_string = now.strftime("%Y-%m-%d__%H_%M_%S")
-    filename = "probabilities_" + color + "_" + datetime_string + ".txt"
+    filename = "probabilities_" + color + "_" + database + "_" + datetime_string + ".txt"
     print_data(position_probabilities, filename)
 
 

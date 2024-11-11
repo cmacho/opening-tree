@@ -4,6 +4,11 @@ from apiclient.lichess_explorer_client import LichessExplorerClient
 class LichessExplorerService:
 
     def __init__(self, database="lichess"):
+        """
+        Parameters:
+        - database (str): Either "lichess" or "master". Which database to use, i.e.
+            either lichess games or master games.
+        """
         self.api_client = LichessExplorerClient(database=database)
 
     def get_move_probabilities(self, list_of_uci_moves):
