@@ -4,6 +4,7 @@ import chess.pgn
 import random
 import pathlib
 from util import read_pgn_files_in_directory
+import util
 
 
 def check_exit(user_input):
@@ -67,7 +68,7 @@ def main():
     """ask user for options and then run corresponding part of the program"""
     print("Enter 'exit' at any time in order to exit the program.")
     params = {}
-    params['fen'] = chessgraph.relevant_fen_part(chess.STARTING_FEN)
+    params['fen'] = util.relevant_fen_part(chess.STARTING_FEN)
     params['mode'] = ask_for_input("Choose mode. Either 'practice' or 'explore'. or 'lookup'.",
                                    ['practice', 'explore', 'lookup'], case_sensitive=False)
     color = ask_for_input(f"Enter 'b' or 'w' to indicate which color you want play as",
@@ -107,7 +108,7 @@ def explore_tree(params):
     Args:
         params (dict): parameters
     """
-    initial_fen = chessgraph.relevant_fen_part(chess.STARTING_FEN)
+    initial_fen = util.relevant_fen_part(chess.STARTING_FEN)
     fen = params['fen']
     list_of_sans = params['list_of_sans'].copy()
     board = chess.Board()
@@ -116,7 +117,7 @@ def explore_tree(params):
     if len(list_of_sans) > 0:
         for san in list_of_sans:
             board.push_san(san)
-            stack.append(chessgraph.relevant_fen_part(board.fen()))
+            stack.append(util.relevant_fen_part(board.fen()))
         #  remove last entry of stack and compare it to fen:
         last_entry = stack.pop()
         assert last_entry == fen
@@ -133,7 +134,7 @@ def explore_tree(params):
                           "Enter 'origin' to print the origins of this position. " \
                           "Enter 'lookup' in order to look up a position. " \
                           "Enter 'practice' in order to practice from this position."
-        if chessgraph.fen_to_color(fen) == graph.color:
+        if util.fen_to_color(fen) == graph.color:
             skip_print = False
             if fen == initial_fen:
                 user_input = None  # go directly to position after first move
@@ -148,9 +149,9 @@ def explore_tree(params):
                 san = moves[0]
                 stack.append(fen)
                 list_of_sans.append(san)
-                fen = chessgraph.get_next_fen(fen, san)
+                fen = util.get_next_fen(fen, san)
                 continue
-        else:  # chessgraph.fen_to_color(fen) != graph.color
+        else:  # util.fen_to_color(fen) != graph.color
             print_which_color_to_move(fen)
             prompt = "Enter one of the moves in SAN format in order to execute the move." + " " + general_prompts
             if not skip_print and graph.get_degree(fen) > 0:
@@ -164,7 +165,7 @@ def explore_tree(params):
             if user_input in graph.get_moves(fen):
                 stack.append(fen)
                 list_of_sans.append(user_input)
-                fen = chessgraph.get_next_fen(fen, user_input)
+                fen = util.get_next_fen(fen, user_input)
                 continue
         if user_input == 'b':
             if len(stack) > 0:
@@ -225,7 +226,7 @@ def practice_openings(params):
             origins_containing_fen = [origin for origin in graph.get_origins(target_leaf) if contains_fen(origin, fen)]
             chosen_line = random.choice(origins_containing_fen)
             opponent_moves = move_dict_from_origin(chosen_line)
-        if chessgraph.fen_to_color(fen) == graph.color:
+        if util.fen_to_color(fen) == graph.color:
             print_basic_position_information(graph, fen, list_of_sans)
             move_list = graph.get_moves(fen)
             correct_san = move_list[0]
@@ -238,7 +239,7 @@ def practice_openings(params):
             user_input = ask_for_input(prompt, options)
 
             if user_input == correct_san:
-                fen = chessgraph.get_next_fen(fen, correct_san)
+                fen = util.get_next_fen(fen, correct_san)
                 list_of_sans.append(correct_san)
                 continue
 
@@ -260,7 +261,7 @@ def practice_openings(params):
                     san = opponent_moves[fen]
                 else:
                     raise Exception(f"Should not reach here. params['move_selection'] is {params['move_selection']}")
-                fen = chessgraph.get_next_fen(fen, san)
+                fen = util.get_next_fen(fen, san)
                 list_of_sans.append(san)
                 continue
             elif len(list_of_sans) >= 2 * params['max_depth'] - 1:
@@ -358,12 +359,12 @@ def look_up_position(params):
         if user_input in list_of_legal_moves(fen):
             board.push_san(user_input)
             list_of_sans.append(user_input)
-            fen = chessgraph.relevant_fen_part(board.fen())
+            fen = util.relevant_fen_part(board.fen())
         elif user_input == 'b':
             if len(list_of_sans) > 0:
                 list_of_sans.pop()
                 board.pop()
-                fen = chessgraph.relevant_fen_part(board.fen())
+                fen = util.relevant_fen_part(board.fen())
             else:
                 print("Cannot go back. This is already the starting position.")
         elif user_input == 'origin':
@@ -377,7 +378,7 @@ def look_up_position(params):
             # since current list_of_sans may not be part of opening tree, parse new list of sans from origin string
             if len(list_of_sans) > 0:
                 origin_string = graph.get_first_origin(fen)
-                params['list_of_sans'] = chessgraph.build_list_of_san_moves_from_origin_string(origin_string)
+                params['list_of_sans'] = util.build_list_of_san_moves_from_origin_string(origin_string)
             else:
                 params['list_of_sans'] = []
             if user_input == 'practice':
@@ -393,7 +394,7 @@ def print_basic_position_information(graph, fen, list_of_sans, include_number_of
     """ print basic information about the position """
     print("========================================================================")
     if len(list_of_sans) > 0:
-        print(chessgraph.build_pgn_from_list_of_san_moves(list_of_sans))
+        print(util.build_pgn_from_list_of_san_moves(list_of_sans))
     else:
         print("Initial position.")
     print("FEN:", fen)
@@ -410,7 +411,7 @@ def print_which_color_to_move(fen):
         fen: (string) the fen representation of a board position. Can also be only the first parts of a FEN, without
         the move clocks.
     """
-    color = chessgraph.fen_to_color(fen)
+    color = util.fen_to_color(fen)
     if color == 'w':
         print("White to move.")
     elif color == 'b':
@@ -431,13 +432,13 @@ def contains_fen(origin_string, fen):
       Returns:
           (bool) boolean indicating whether the position occurs
     """
-    fen = chessgraph.relevant_fen_part(fen)
-    list_of_sans = chessgraph.build_list_of_san_moves_from_origin_string(origin_string)
-    current_fen = chessgraph.relevant_fen_part(chess.STARTING_FEN)
+    fen = util.relevant_fen_part(fen)
+    list_of_sans = util.build_list_of_san_moves_from_origin_string(origin_string)
+    current_fen = util.relevant_fen_part(chess.STARTING_FEN)
     if current_fen == fen:
         return True
     for san in list_of_sans:
-        current_fen = chessgraph.get_next_fen(current_fen, san)
+        current_fen = util.get_next_fen(current_fen, san)
         if current_fen == fen:
             return True
     return False
@@ -452,12 +453,12 @@ def move_dict_from_origin(origin_string):
     Returns:
         move_dict (dict): maps board positions to the next move as it occurs in origin_string.
     """
-    list_of_sans = chessgraph.build_list_of_san_moves_from_origin_string(origin_string)
+    list_of_sans = util.build_list_of_san_moves_from_origin_string(origin_string)
     move_dict = {}
-    current_fen = chessgraph.relevant_fen_part(chess.STARTING_FEN)
+    current_fen = util.relevant_fen_part(chess.STARTING_FEN)
     for san in list_of_sans:
         move_dict[current_fen] = san
-        current_fen = chessgraph.get_next_fen(current_fen, san)
+        current_fen = util.get_next_fen(current_fen, san)
     return move_dict
 
 
@@ -492,9 +493,9 @@ def stats_for_moves(graph, fen):
     stats = {}
     moves = graph.get_moves(fen)
     for i, san in enumerate(moves):
-        new_fen = chessgraph.get_next_fen(fen, san)
+        new_fen = util.get_next_fen(fen, san)
         new_san = graph.get_moves(new_fen)[0]
-        new_new_fen = chessgraph.get_next_fen(new_fen, new_san)
+        new_new_fen = util.get_next_fen(new_fen, new_san)
         num_children = graph.get_degree(new_new_fen)
         num_leaves, num_nodes = graph.compute_stats(new_fen)
         stats[san] = (num_children, num_leaves, num_nodes)
@@ -521,7 +522,7 @@ def leaves(graph, depth, fen):
             break
         if graph.get_degree(curr_fen) == 0:  # leaf
             leaf_list.append(curr_fen)
-        elif num_moves > 2 * (depth - 1) and chessgraph.fen_to_color(curr_fen) != graph.color:
+        elif num_moves > 2 * (depth - 1) and util.fen_to_color(curr_fen) != graph.color:
             leaf_list.append(curr_fen)
     return leaf_list
 
