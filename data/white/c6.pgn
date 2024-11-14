@@ -6,9 +6,11 @@
 [Black "Black"]
 [Result "*"]
 
-1. d4 c6 2. Nf3 Nf6 (2... b6 3. e4) (2... d5 3. Bf4 Nf6 (3... Bf5 4. c4 dxc4 5.
-Nbd2) 4. e3 Qb6 (4... Bf5 5. c4 Qb6 6. Qc1) 5. Qc1 Bf5 6. c4) 3. e3 d5 4. c4 Bg4
-(4... e6 5. b3) 5. Qb3 Qb6 (5... Bxf3 6. Qxb7 Be4 (6... Nbd7 7. gxf3 e5 8. c5
-Rc8 9. Qa6) 7. Qxa8 Qc7 8. f3 Bg6 9. Nc3 e6 10. cxd5 Nxd5 11. Nxd5 exd5 12. Bd2
-Bd6 13. Ba6 Qb6 14. Be2 O-O 15. Rc1 Bf5 16. b4 Rc8 17. b5) 6. Ne5 Bf5 7. cxd5
-Qxb3 8. axb3 Nxd5 9. Bd3 Bxd3 10. Nxd3 e6 11. Bd2 *
+1. d4 c6 2. Nf3 Nf6 (2... b6 3. e4 d5 4. Nc3 e6 5. Bd3 Bb4 6. exd5 cxd5 7. Ne5
+Nf6 8. O-O O-O 9. Qf3 Ba6 10. Nb5 Bxb5 11. Bxb5 Qc7 12. Bf4 Bd6 13. c3) (2... d5
+3. Bf4 Nf6 (3... Bf5 4. c4 dxc4 5. Nbd2) 4. e3 Qb6 (4... Bf5 5. c4 Qb6 6. Qc1)
+5. Qc1 Bf5 6. c4) 3. e3 d5 4. c4 Bg4 (4... e6 5. b3) 5. Qb3 Qb6 (5... Bxf3 6.
+Qxb7 Be4 (6... Nbd7 7. gxf3 e5 8. c5 Rc8 9. Qa6) 7. Qxa8 Qc7 8. f3 Bg6 9. Nc3 e6
+10. cxd5 Nxd5 11. Nxd5 exd5 12. Bd2 Bd6 13. Ba6 Qb6 14. Be2 O-O 15. Rc1 Bf5 16.
+b4 Rc8 17. b5) 6. Ne5 Bf5 7. cxd5 Qxb3 8. axb3 Nxd5 9. Bd3 Bxd3 10. Nxd3 e6 11.
+Bd2 *
