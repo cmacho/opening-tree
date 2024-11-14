@@ -25,7 +25,7 @@ def fen_to_color(fen):
         fen: (string) the fen representation of a board position. Can also be only the first parts of a FEN, without
         the move clocks.
 
-    Returns: (string) "b" if it is black'r turn or "w" if it is white's turn
+    Returns: (string) "b" if it is black's turn or "w" if it is white's turn
     """
     parts = fen.split()
     turn_part = parts[1]

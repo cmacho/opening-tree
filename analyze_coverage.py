@@ -22,10 +22,13 @@ def main():
              "first part of the fen. e.g. 'rnbqkbnr/ppp1pppp/8/3p4/3P4/8/PPP1PPPP/RNBQKBNR w KQkq - 0 2'."
              "The position has to be part of the opening tree."
     )
+    parser.add_argument('--output_fen_only', action='store_true',
+                        help='Flag to only put a list of FENs in the output without any other information')
 
     args = parser.parse_args()
     color = args.color
     database = args.database
+    output_fen_only = args.output_fen_only
     if args.starting_pos is not None and len(args.starting_pos) > 0:
         starting_position = util.relevant_fen_part(args.starting_pos)
     else:
@@ -52,30 +55,35 @@ def main():
     print(f"Number of positions with probabilities: {len(position_probabilities)}")
 
     now = datetime.now()
-    datetime_string = now.strftime("%Y-%m-%d__%H_%M_%S")
+    datetime_string = "__" + now.strftime("%Y-%m-%d__%H_%M_%S")
     if args.starting_pos is not None and len(args.starting_pos) > 0:
-        pos_string = "_" + "custom_starting_pos" + "_"
+        pos_string = "_" + "custom_starting_pos"
         starting_depth = get_depth_of_position(starting_position, graph)
-        pos_string = pos_string + str(starting_depth) + "_"
+        pos_string = pos_string + "_" + str(starting_depth)
     else:
         pos_string = ""
     filename = "probabilities_" + color + "_" + database + pos_string + datetime_string + ".txt"
-    print_data(position_probabilities, filename)
+    print_data(position_probabilities, filename, output_fen_only)
 
 
 def get_depth_of_position(fen, graph):
+    if fen == util.relevant_fen_part(chess.STARTING_FEN):
+        return 0
     origin = graph.get_first_origin(fen)
     list_of_san_moves = util.build_list_of_san_moves_from_origin_string(origin)
     return len(list_of_san_moves)
 
 
-def print_data(position_probabilities, filename):
+def print_data(position_probabilities, filename, output_fen_only):
     with open(filename, "a") as file:
         sorted_position_probs = sorted(position_probabilities.items(), key=lambda x: x[1]['prob'], reverse=True)
         for i, keyValuePair in enumerate(sorted_position_probs, start=1):
-            print(f"{i}:", file=file)
-            pretty_print_entry(keyValuePair[0], keyValuePair[1], file)
-            print("", file=file)
+            if output_fen_only:
+                print(keyValuePair[0], file=file)
+            else:
+                print(f"{i}:", file=file)
+                pretty_print_entry(keyValuePair[0], keyValuePair[1], file)
+                print("", file=file)
 
 
 def pretty_print_entry(fen, prob_entry, file):
