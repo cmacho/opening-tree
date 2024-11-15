@@ -144,7 +144,6 @@ def initialize_explored_positions(position_probabilities, graph, starting_positi
     count = 0
     for fen in graph.breadth_first(starting_position):
         count += 1
-        print(fen)
         position_probabilities[fen] = initialize_data_for_a_position(util.fen_to_color(fen), True)
         position_probabilities[fen]['origins'].extend(graph.get_origins(fen))
         position_probabilities[fen]['depth'] = get_depth_of_position(fen, graph)
