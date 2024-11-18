@@ -1,0 +1,12 @@
+[Event "?"]
+[Site "?"]
+[Date "2024.11.17"]
+[Round "?"]
+[White "White"]
+[Black "Black"]
+[Result "*"]
+
+1. d4 Nf6 2. c4 (2. e3 d5 3. Nf3 c5 4. Be2 Nc6 5. O-O Bf5) e6 3. Nf3 (3. g3 Bb4+
+4. Bd2 Be7 5. Bg2 d5 6. Nf3 O-O 7. O-O Nbd7 8. Qc2 c6 9. Bf4 b6) (3. Nc3 Bb4 4.
+Nf3 O-O 5. Bg5 c5 6. e3 cxd4 7. exd4 d5 8. Rc1 h6 9. Bh4 Nc6) d5 4. Nc3 Be7 5.
+Bg5 (5. e3 O-O 6. b3 c5 7. dxc5 Bxc5) h6 6. Bh4 O-O 7. e3 b6 8. Be2 Bb7 *
