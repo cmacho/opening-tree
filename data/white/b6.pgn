@@ -6,6 +6,7 @@
 [Black "Black"]
 [Result "*"]
 
-1. d4 b6 2. e4 Bb7 3. Bd3 d6 (3... e6 4. Nf3 c5 5. c3 Nf6 6. Qe2 d5 7. e5 Nfd7
-8. Bf4) (3... Nf6 4. Qe2 e6 5. Nf3 d5 6. e5 Nfd7 7. Ng5 Qe7 8. f4 c5 9. c3) 4.
-Nf3 Nd7 5. a4 *
+1. d4 b6 2. e4 Bb7 3. Bd3 d6 (3... e6 4. Nf3 c5 (4... Nf6 5. e5 Ne4 6. Qe2 f5 7.
+Nbd2 Ng5 8. h4 Nf7 9. a3 c5 10. dxc5 Nc6 11. cxb6 axb6 12. Nb3) 5. c3 Nf6 6. Qe2
+d5 7. e5 Nfd7 8. Bf4) (3... Nf6 4. Qe2 e6 5. Nf3 d5 6. e5 Nfd7 7. Ng5 Qe7 8. f4
+c5 9. c3) 4. Nf3 Nd7 5. a4 *
